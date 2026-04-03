@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#030618">
   <title>Cosmic Connect</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after {
       margin: 0; padding: 0; box-sizing: border-box;
@@ -13,14 +13,16 @@
     }
 
     :root {
-      --purple: #a78bfa;
+      --gold:    #FFD700;
+      --gold-dim: rgba(255,215,0,0.55);
+      --purple:  #a78bfa;
       --purple-deep: #7c3aed;
-      --blue: #60a5fa;
-      --bg: #030618;
-      --card: rgba(12, 8, 35, 0.95);
-      --text: #e8e8f0;
-      --muted: rgba(232, 232, 240, 0.45);
-      --border: rgba(167, 139, 250, 0.18);
+      --blue:    #60a5fa;
+      --bg:      #030618;
+      --card:    rgba(10,6,30,0.97);
+      --text:    #e8e8f0;
+      --muted:   rgba(232,232,240,0.45);
+      --border:  rgba(167,139,250,0.18);
     }
 
     body {
@@ -61,70 +63,91 @@
     }
 
     .logo {
-      font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+      font-family: 'Orbitron', monospace;
+      font-size: 16px; font-weight: 700; letter-spacing: 1px;
       background: linear-gradient(135deg, #c4b5fd, #818cf8, #67e8f9);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
-    .logo span { font-weight: 300; opacity: 0.7; }
+    .logo span { font-weight: 400; opacity: 0.7; }
 
     .streak-badge {
       display: flex; align-items: center; gap: 5px;
       background: rgba(167,139,250,0.08);
       border: 1px solid var(--border);
       border-radius: 20px; padding: 5px 12px;
-      font-size: 13px; font-weight: 500; color: var(--purple);
+      font-size: 13px; font-weight: 600; color: var(--purple);
+      font-family: 'Orbitron', monospace;
       cursor: default; user-select: none;
     }
 
     /* ── CONSTELLATION INFO ── */
     .const-info {
-      text-align: center; padding: 6px 0 12px;
+      text-align: center; padding: 4px 0 8px;
     }
 
     .const-name {
-      font-size: 28px; font-weight: 700; letter-spacing: -0.5px;
-      line-height: 1.1; margin-bottom: 5px;
+      font-family: 'Orbitron', monospace;
+      font-size: 26px; font-weight: 700; letter-spacing: 1px;
+      line-height: 1.1; margin-bottom: 6px;
+      background: linear-gradient(135deg, #fff 0%, #c4b5fd 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
 
     .const-desc {
-      font-size: 13px; color: var(--muted); font-weight: 300;
-      line-height: 1.4; padding: 0 12px;
+      font-size: 13px; color: var(--muted); font-weight: 400;
+      line-height: 1.5; padding: 0 8px;
     }
 
-    /* ── ATTEMPTS ── */
+    .const-task {
+      font-size: 12px;
+      color: rgba(255, 215, 0, 0.7);
+      font-weight: 500;
+      margin-top: 4px;
+      letter-spacing: 0.2px;
+    }
+
+    /* ── GAME CONTROLS ROW ── */
+    .game-controls {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 0 6px;
+    }
+
     .attempts-row {
-      display: flex; align-items: center; justify-content: center;
-      gap: 10px; padding: 6px 0 8px;
-      font-size: 12px; color: var(--muted); letter-spacing: 0.3px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11px; color: var(--muted); letter-spacing: 0.3px;
     }
 
-    .attempt-pips {
-      display: flex; gap: 5px;
-    }
+    .attempt-pips { display: flex; gap: 5px; }
 
     .pip {
-      width: 9px; height: 9px; border-radius: 50%;
+      width: 10px; height: 10px; border-radius: 50%;
       background: rgba(232,232,240,0.15);
       transition: all 0.35s ease;
     }
-    .pip.used { background: rgba(239,68,68,0.55); box-shadow: 0 0 6px rgba(239,68,68,0.3); }
-    .pip.ok   { background: rgba(167,139,250,0.6); box-shadow: 0 0 6px rgba(167,139,250,0.3); }
+    .pip.used { background: rgba(239,68,68,0.6); box-shadow: 0 0 6px rgba(239,68,68,0.35); }
+    .pip.ok   { background: rgba(167,139,250,0.65); box-shadow: 0 0 6px rgba(167,139,250,0.3); }
+
+    .step-progress {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px; font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.5px;
+    }
 
     /* ── CANVAS ── */
     .canvas-wrap {
       position: relative; width: 100%;
-      flex: 1; min-height: 300px; max-height: 460px;
+      flex: 1; min-height: 280px; max-height: 440px;
     }
 
     #gameCanvas {
       display: block; width: 100%; height: 100%;
       cursor: crosshair; touch-action: none;
       border-radius: 18px;
-      background: rgba(3,6,24,0.5);
-      border: 1px solid rgba(167,139,250,0.08);
+      background: rgba(3,6,24,0.6);
+      border: 1px solid rgba(167,139,250,0.10);
     }
 
-    /* Wrong-click shake on canvas wrapper */
     @keyframes shake {
       0%,100%{transform:translateX(0)}
       15%{transform:translateX(-8px)}
@@ -136,17 +159,40 @@
     }
     .shake { animation: shake 0.45s ease; }
 
-    /* ── BOTTOM HINT ── */
-    .hint {
-      text-align: center; font-size: 12px; color: rgba(232,232,240,0.22);
-      padding: 7px 0; letter-spacing: 0.3px;
+    /* ── HINT ROW ── */
+    .hint-row {
+      display: flex; align-items: center; justify-content: center;
+      padding: 8px 0 4px; gap: 12px;
+    }
+
+    .hint-btn {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,215,0,0.07);
+      border: 1px solid rgba(255,215,0,0.25);
+      border-radius: 20px; padding: 7px 18px;
+      color: rgba(255,215,0,0.85);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s ease;
+      letter-spacing: 0.2px;
+    }
+    .hint-btn:hover:not(:disabled) {
+      background: rgba(255,215,0,0.13);
+      border-color: rgba(255,215,0,0.45);
+      color: #FFD700;
+    }
+    .hint-btn:disabled {
+      opacity: 0.3; cursor: not-allowed;
+      border-color: rgba(255,255,255,0.1);
+      color: var(--muted);
     }
 
     /* ── FOOTER ── */
     footer {
-      text-align: center; padding: 10px 0 16px;
-      font-size: 11px; color: rgba(232,232,240,0.18);
-      letter-spacing: 0.8px; text-transform: uppercase;
+      text-align: center; padding: 8px 0 14px;
+      font-family: 'Orbitron', monospace;
+      font-size: 10px; color: rgba(232,232,240,0.18);
+      letter-spacing: 1.5px; text-transform: uppercase;
     }
 
     /* ── OVERLAYS ── */
@@ -164,7 +210,7 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 24px;
-      padding: 30px 22px;
+      padding: 28px 22px 24px;
       width: 100%; max-width: 360px;
       text-align: center;
       animation: cardIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
@@ -175,34 +221,68 @@
       to   { opacity:1; transform: scale(1)   translateY(0); }
     }
 
-    .card-icon { font-size: 54px; display: block; margin-bottom: 14px; }
+    .card-icon { font-size: 50px; display: block; margin-bottom: 12px; line-height: 1; }
 
     .card-title {
-      font-size: 24px; font-weight: 700; letter-spacing: -0.4px;
-      margin-bottom: 6px;
+      font-family: 'Orbitron', monospace;
+      font-size: 20px; font-weight: 700; letter-spacing: 0.5px;
+      margin-bottom: 8px;
     }
 
     .card-sub {
       font-size: 13px; color: var(--muted); line-height: 1.55;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
+
+    /* Tutorial steps */
+    .tutorial-steps {
+      text-align: left; margin-bottom: 22px;
+    }
+    .tutorial-step {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 14px; line-height: 1.45;
+    }
+    .tutorial-step:last-child { border-bottom: none; }
+    .t-num {
+      display: flex; align-items: center; justify-content: center;
+      min-width: 26px; height: 26px; border-radius: 50%;
+      background: rgba(255,215,0,0.12);
+      border: 1px solid rgba(255,215,0,0.3);
+      font-family: 'Orbitron', monospace;
+      font-size: 11px; font-weight: 700;
+      color: var(--gold); flex-shrink: 0;
+    }
+    .tutorial-step strong { color: var(--text); }
+
+    /* Win constellation canvas */
+    .win-canvas-wrap {
+      width: 100%; height: 180px;
+      margin-bottom: 14px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,215,0,0.15);
+      background: rgba(3,6,24,0.7);
+    }
+    #winCanvas { display: block; width: 100%; height: 100%; }
 
     /* Share box */
     .share-box {
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 14px; padding: 16px;
-      font-size: 22px; line-height: 1.7; letter-spacing: 3px;
+      border-radius: 14px; padding: 14px;
+      font-size: 24px; line-height: 1.7; letter-spacing: 3px;
       margin-bottom: 6px;
     }
 
     .share-label {
       font-size: 11px; color: rgba(232,232,240,0.3);
-      margin-bottom: 20px; letter-spacing: 0.3px;
+      margin-bottom: 18px; letter-spacing: 0.3px;
     }
 
     /* Buttons */
-    .btn-row { display: flex; flex-direction: column; gap: 9px; margin-bottom: 18px; }
+    .btn-row { display: flex; flex-direction: column; gap: 9px; margin-bottom: 16px; }
 
     .btn {
       display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -220,6 +300,14 @@
     .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 26px rgba(124,58,237,0.4); }
     .btn-primary:active { transform: translateY(0); }
 
+    .btn-gold {
+      background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,180,0,0.1));
+      border: 1px solid rgba(255,215,0,0.35);
+      color: var(--gold);
+      font-family: 'Orbitron', monospace; font-size: 13px;
+    }
+    .btn-gold:hover { background: rgba(255,215,0,0.2); }
+
     .btn-ghost {
       background: rgba(255,255,255,0.05);
       color: var(--muted);
@@ -235,19 +323,18 @@
       margin-bottom: 18px;
     }
     .reveal-label { font-size: 10px; color: rgba(232,232,240,0.3); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
-    .reveal-name  { font-size: 20px; font-weight: 600; }
-    .reveal-desc  { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .reveal-name  { font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 700; }
+    .reveal-desc  { font-size: 12px; color: var(--muted); margin-top: 5px; line-height: 1.4; }
 
     /* Email opt-in */
     .optin {
       background: rgba(167,139,250,0.05);
       border: 1px solid rgba(167,139,250,0.12);
-      border-radius: 16px; padding: 16px;
+      border-radius: 16px; padding: 14px;
     }
-
     .optin p {
       font-size: 13px; color: rgba(232,232,240,0.55);
-      margin-bottom: 11px; line-height: 1.45;
+      margin-bottom: 10px; line-height: 1.45;
     }
     .optin p strong { color: var(--purple); font-weight: 600; }
 
@@ -257,7 +344,7 @@
       flex: 1;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px; padding: 9px 13px;
+      border-radius: 10px; padding: 9px 12px;
       color: var(--text); font-family: inherit; font-size: 13px;
       outline: none; transition: border-color 0.2s;
     }
@@ -268,7 +355,7 @@
       background: rgba(167,139,250,0.15);
       border: 1px solid rgba(167,139,250,0.25);
       color: var(--purple); border-radius: 10px;
-      padding: 9px 15px; font-family: inherit;
+      padding: 9px 14px; font-family: inherit;
       font-size: 13px; font-weight: 600; cursor: pointer;
       transition: all 0.2s; white-space: nowrap;
     }
@@ -283,7 +370,7 @@
     .toast {
       position: fixed; top: 18px; left: 50%;
       transform: translateX(-50%) translateY(-80px);
-      background: rgba(12,8,35,0.97);
+      background: rgba(10,6,30,0.97);
       border: 1px solid rgba(167,139,250,0.25);
       border-radius: 12px; padding: 11px 20px;
       font-size: 13px; font-weight: 500; z-index: 300;
@@ -295,13 +382,16 @@
     .toast.ok      { border-color: rgba(52,211,153,0.35); color: #6ee7b7; }
     .toast.neutral { color: var(--text); }
 
-    /* ── STEP COUNTER ── */
-    .steps-label {
-      font-size: 11px; color: var(--muted); letter-spacing: 0.3px;
+    /* Next-star indicator */
+    .next-indicator {
+      text-align: center;
+      font-size: 12px;
+      color: rgba(255,215,0,0.6);
+      letter-spacing: 0.3px;
+      padding: 2px 0 4px;
+      min-height: 18px;
     }
-    .steps-val {
-      font-size: 11px; color: var(--purple); font-weight: 600;
-    }
+    .next-indicator strong { color: var(--gold); }
   </style>
 </head>
 <body>
@@ -309,27 +399,65 @@
 <div class="container">
   <header>
     <div class="logo">✦ Cosmic<span>Connect</span></div>
-    <div class="streak-badge" id="streakBadge">🔥 <span id="streakNum">0</span></div>
+    <div class="streak-badge">🔥 <span id="streakNum">0</span></div>
   </header>
 
   <div class="const-info">
     <div class="const-name" id="constName">Loading…</div>
     <div class="const-desc" id="constDesc"></div>
+    <div class="const-task" id="constTask"></div>
   </div>
 
-  <div class="attempts-row">
-    <span class="steps-label">Attempts</span>
-    <div class="attempt-pips" id="pips"></div>
-    <span class="steps-val" id="stepsVal"></span>
+  <div class="game-controls">
+    <div class="attempts-row">
+      <span style="font-size:11px;color:var(--muted);">Attempts</span>
+      <div class="attempt-pips" id="pips"></div>
+    </div>
+    <div class="step-progress" id="stepProgress"></div>
   </div>
+
+  <div class="next-indicator" id="nextIndicator"></div>
 
   <div class="canvas-wrap" id="canvasWrap">
     <canvas id="gameCanvas"></canvas>
   </div>
 
-  <div class="hint" id="hintText">Tap the stars in the right order to trace the constellation</div>
+  <div class="hint-row">
+    <button class="hint-btn" id="hintBtn" onclick="useHint()">💡 Hint</button>
+  </div>
 
   <footer>A CEREBRA Game</footer>
+</div>
+
+<!-- ═══ TUTORIAL OVERLAY (first visit) ═══ -->
+<div class="overlay" id="tutorialOverlay">
+  <div class="card">
+    <span class="card-icon">🌌</span>
+    <div class="card-title">How to Play</div>
+    <div class="tutorial-steps">
+      <div class="tutorial-step">
+        <span class="t-num">1</span>
+        <span>Each star has a <strong>number</strong> — click them in order <strong>1 → 2 → 3…</strong></span>
+      </div>
+      <div class="tutorial-step">
+        <span class="t-num">2</span>
+        <span>The <strong>glowing star</strong> is your next target — it pulses gold</span>
+      </div>
+      <div class="tutorial-step">
+        <span class="t-num">3</span>
+        <span><strong>Golden lines</strong> draw between stars as you connect them</span>
+      </div>
+      <div class="tutorial-step">
+        <span class="t-num">4</span>
+        <span>Wrong click = lose an attempt. You have <strong>5 chances</strong> to trace the shape</span>
+      </div>
+      <div class="tutorial-step">
+        <span class="t-num">💡</span>
+        <span>Use the <strong>Hint</strong> button to briefly see all connections (once per day)</span>
+      </div>
+    </div>
+    <button class="btn btn-gold" onclick="dismissTutorial()">Got it, let's play! 🚀</button>
+  </div>
 </div>
 
 <!-- ═══ SUCCESS OVERLAY ═══ -->
@@ -338,6 +466,10 @@
     <span class="card-icon">🌟</span>
     <div class="card-title">Constellation Traced!</div>
     <div class="card-sub" id="successSub">You connected the stars beautifully.</div>
+
+    <div class="win-canvas-wrap">
+      <canvas id="winCanvas"></canvas>
+    </div>
 
     <div class="share-box" id="shareEmojis"></div>
     <div class="share-label" id="shareLabel"></div>
@@ -350,9 +482,9 @@
       <p>✨ Get a new constellation every day — <strong>join CEREBRA</strong></p>
       <div class="email-row">
         <input type="email" class="email-input" id="emailSuccess" placeholder="your@email.com">
-        <button class="btn-join" onclick="joinCerebra('emailSuccess', 'okSuccess')">Join →</button>
+        <button class="btn-join" onclick="joinCerebra('emailSuccess','okSuccess')">Join →</button>
       </div>
-      <div class="email-ok" id="okSuccess">✓ Welcome aboard — see you tomorrow!</div>
+      <div class="email-ok" id="okSuccess">✓ Welcome aboard!</div>
     </div>
   </div>
 </div>
@@ -378,9 +510,9 @@
       <p>✨ Get a new constellation every day — <strong>join CEREBRA</strong></p>
       <div class="email-row">
         <input type="email" class="email-input" id="emailFail" placeholder="your@email.com">
-        <button class="btn-join" onclick="joinCerebra('emailFail', 'okFail')">Join →</button>
+        <button class="btn-join" onclick="joinCerebra('emailFail','okFail')">Join →</button>
       </div>
-      <div class="email-ok" id="okFail">✓ Welcome aboard — see you tomorrow!</div>
+      <div class="email-ok" id="okFail">✓ Welcome aboard!</div>
     </div>
   </div>
 </div>
@@ -390,7 +522,7 @@
   <div class="card">
     <span class="card-icon">🌙</span>
     <div class="card-title">Come Back Tomorrow</div>
-    <div class="card-sub" id="doneSub">You've already played today's puzzle. A new constellation awaits tomorrow!</div>
+    <div class="card-sub" id="doneSub">You've already played today's puzzle!</div>
 
     <div class="share-box" id="doneEmojis"></div>
     <div class="share-label" id="doneLabel"></div>
@@ -403,9 +535,9 @@
       <p>✨ Never miss a puzzle — <strong>join CEREBRA</strong></p>
       <div class="email-row">
         <input type="email" class="email-input" id="emailDone" placeholder="your@email.com">
-        <button class="btn-join" onclick="joinCerebra('emailDone', 'okDone')">Join →</button>
+        <button class="btn-join" onclick="joinCerebra('emailDone','okDone')">Join →</button>
       </div>
-      <div class="email-ok" id="okDone">✓ Welcome aboard — see you tomorrow!</div>
+      <div class="email-ok" id="okDone">✓ Welcome aboard!</div>
     </div>
   </div>
 </div>
@@ -417,7 +549,6 @@
    CONSTELLATION DATA  (35 constellations)
    Stars: x,y in 0–100 normalised grid
    order: click sequence of star indices
-   (repeated indices = revisit that star)
    ════════════════════════════════════════════ */
 const CONSTELLATIONS = [
   {
@@ -426,7 +557,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:34,y:20},{x:65,y:18},{x:36,y:52},{x:50,y:50},{x:64,y:48},{x:38,y:80},{x:63,y:82}
     ],
-    // Betelgeuse(0) Bellatrix(1) Alnitak(2) Alnilam(3) Mintaka(4) Saiph(5) Rigel(6)
     order:[0,2,3,4,1,6,5]
   },
   {
@@ -435,7 +565,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:18,y:42},{x:30,y:37},{x:43,y:33},{x:55,y:36},{x:62,y:57},{x:74,y:60},{x:70,y:36}
     ],
-    // Alkaid(0) Mizar(1) Alioth(2) Megrez(3) Phecda(4) Merak(5) Dubhe(6)
     order:[0,1,2,3,6,5,4]
   },
   {
@@ -444,7 +573,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:14,y:62},{x:30,y:33},{x:50,y:57},{x:68,y:27},{x:83,y:50}
     ],
-    // Segin(0) Ruchbah(1) Gamma-Cas(2) Schedar(3) Caph(4)
     order:[0,1,2,3,4]
   },
   {
@@ -453,7 +581,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:22,y:72},{x:35,y:50},{x:44,y:28},{x:57,y:35},{x:68,y:50},{x:78,y:68}
     ],
-    // Regulus(0) Eta(1) Algieba(2) Adhafera(3) Zosma(4) Denebola(5)
     order:[0,1,2,3,4,5]
   },
   {
@@ -462,7 +589,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:42,y:12},{x:52,y:25},{x:44,y:38},{x:36,y:52},{x:40,y:65},{x:50,y:75},{x:60,y:68},{x:65,y:55}
     ],
-    // Graffias(0) Dschubba(1) Antares(2) Tau(3) Shaula(4) Lesath(5) Girtab(6) Sargas(7)
     order:[0,1,2,3,4,5,6,7]
   },
   {
@@ -471,7 +597,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:24,y:18},{x:40,y:18},{x:22,y:42},{x:38,y:43},{x:22,y:68},{x:40,y:68}
     ],
-    // Castor(0) Pollux(1) Mebsuda(2) Wasat(3) Tejat(4) Alhena(5)
     order:[0,2,4,5,3,1]
   },
   {
@@ -480,7 +605,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:34,y:22},{x:56,y:27},{x:42,y:42},{x:62,y:52},{x:48,y:64},{x:70,y:72}
     ],
-    // Sadalsuud(0) Sadalmelik(1) Sadachbia(2) Skat(3) Eta(4) Albali(5)
     order:[0,2,1,3,4,5]
   },
   {
@@ -489,7 +613,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:20,y:55},{x:35,y:38},{x:48,y:28},{x:56,y:42},{x:60,y:62},{x:72,y:44}
     ],
-    // Aldebaran(0) Hyadum(1) Ain(2) Prima(3) Theta(4) Alcyone(5)
     order:[0,1,2,3,4,5]
   },
   {
@@ -498,7 +621,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:18,y:58},{x:30,y:75},{x:44,y:60},{x:56,y:45},{x:63,y:30},{x:73,y:17}
     ],
-    // Delta(0) Mirfak(1) Algol(2) Rho(3) Theta(4) Iota(5)
     order:[0,1,2,3,4,5]
   },
   {
@@ -507,7 +629,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:50,y:16},{x:34,y:44},{x:58,y:42},{x:30,y:68},{x:62,y:66}
     ],
-    // Vega(0) Zeta(1) Epsilon(2) Beta(3) Gamma(4)
     order:[0,2,4,3,1,0]
   },
   {
@@ -516,7 +637,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:50,y:12},{x:50,y:40},{x:20,y:40},{x:80,y:40},{x:50,y:68},{x:50,y:84}
     ],
-    // Deneb(0) Sadr(1) Gienah(2) Delta(3) Eta(4) Albireo(5)
     order:[2,1,3,1,0,1,4,5]
   },
   {
@@ -525,7 +645,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:50,y:18},{x:36,y:34},{x:63,y:37},{x:28,y:57},{x:74,y:60}
     ],
-    // Altair(0) Tarazed(1) Alshain(2) Eta(3) Theta(4)
     order:[3,1,0,2,4]
   },
   {
@@ -534,7 +653,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:68,y:18},{x:74,y:35},{x:62,y:45},{x:46,y:55},{x:32,y:50},{x:22,y:35},{x:26,y:20}
     ],
-    // Eltanin(0) Rastaban(1) Grumium(2) Etamin(3) Nodus(4) Thuban(5) Kappa(6)
     order:[6,5,4,3,2,1,0]
   },
   {
@@ -543,7 +661,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:36,y:24},{x:60,y:22},{x:68,y:48},{x:54,y:64},{x:36,y:64},{x:24,y:46}
     ],
-    // Kornephoros(0) Zeta(1) Pi(2) Eta(3) Epsilon(4) Delta(5)
     order:[0,1,2,3,4,5]
   },
   {
@@ -552,7 +669,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:50,y:15},{x:30,y:42},{x:70,y:40},{x:24,y:68},{x:74,y:64}
     ],
-    // Arcturus(0) Eta(1) Epsilon(2) Delta(3) Gamma(4)
     order:[3,1,0,2,4]
   },
   {
@@ -561,7 +677,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:18,y:62},{x:33,y:35},{x:50,y:22},{x:67,y:35},{x:82,y:62}
     ],
-    // Theta(0) Beta(1) Alphecca(2) Gamma(3) Iota(4)
     order:[0,1,2,3,4]
   },
   {
@@ -570,7 +685,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:28,y:22},{x:44,y:35},{x:56,y:25},{x:64,y:52},{x:44,y:65},{x:22,y:52}
     ],
-    // Vindemiatrix(0) Porrima(1) Zaniah(2) Spica(3) Heze(4) Eta(5)
     order:[0,1,2,3,4,5]
   },
   {
@@ -579,7 +693,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:24,y:55},{x:44,y:27},{x:62,y:24},{x:72,y:52},{x:36,y:72}
     ],
-    // Beta(0) Zubenelgenubi(1) Zubeneschamali(2) Gamma(3) Iota(4)
     order:[0,1,2,3,4]
   },
   {
@@ -588,7 +701,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:22,y:50},{x:40,y:40},{x:56,y:42},{x:70,y:35}
     ],
-    // Hamal(0) Sheratan(1) Mesarthim(2) 41-Ari(3)
     order:[0,1,2,3]
   },
   {
@@ -597,7 +709,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:22,y:50},{x:44,y:30},{x:60,y:28},{x:74,y:45},{x:46,y:68}
     ],
-    // Acubens(0) Asellus Borealis(1) Asellus Australis(2) Iota(3) Beta(4)
     order:[0,4,2,1,4,3]
   },
   {
@@ -606,7 +717,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:22,y:75},{x:35,y:58},{x:50,y:44},{x:60,y:58},{x:70,y:68},{x:62,y:80},{x:42,y:80}
     ],
-    // KausAus(0) KausMed(1) KausBor(2) Nunki(3) Tau(4) Zeta(5) Phi(6)
     order:[0,1,2,3,4,5,6]
   },
   {
@@ -615,7 +725,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:18,y:20},{x:72,y:18},{x:74,y:70},{x:16,y:72},{x:45,y:45}
     ],
-    // Scheat(0) Enif(1) Markab(2) Algenib(3) Homam(4)
     order:[4,0,3,2,1]
   },
   {
@@ -624,7 +733,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:18,y:55},{x:36,y:42},{x:56,y:32},{x:70,y:22},{x:28,y:70}
     ],
-    // Alpheratz(0) Mirach(1) Almach(2) Upsilon(3) Delta(4)
     order:[4,0,1,2,3]
   },
   {
@@ -633,7 +741,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:35,y:18},{x:18,y:40},{x:54,y:44},{x:66,y:58},{x:28,y:64}
     ],
-    // Sirius(0) Mirzam(1) Aludra(2) Eta(3) Wezen(4)
     order:[1,0,2,3,4]
   },
   {
@@ -642,7 +749,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:22,y:28},{x:38,y:18},{x:58,y:24},{x:68,y:46},{x:40,y:58}
     ],
-    // Alchiba(0) Gienah(1) Kraz(2) Algorab(3) Minkar(4)
     order:[0,1,2,3,4]
   },
   {
@@ -651,7 +757,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:50,y:20},{x:28,y:44},{x:74,y:42},{x:35,y:68},{x:65,y:65}
     ],
-    // Rotanev(0) Svalocin(1) Gamma(2) Delta(3) Epsilon(4)
     order:[1,0,2,4,3]
   },
   {
@@ -660,7 +765,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:24,y:28},{x:46,y:22},{x:63,y:34},{x:66,y:58},{x:38,y:65}
     ],
-    // Arneb(0) Nihal(1) Epsilon(2) Mu(3) Kappa(4)
     order:[0,1,2,3,4]
   },
   {
@@ -669,7 +773,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:50,y:15},{x:28,y:35},{x:70,y:32},{x:18,y:58},{x:75,y:60},{x:50,y:75}
     ],
-    // Rasalhague(0) Cebalrai(1) Zeta(2) Eta(3) Theta(4) Sabik(5)
     order:[0,1,3,5,4,2]
   },
   {
@@ -678,7 +781,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:18,y:30},{x:36,y:22},{x:54,y:26},{x:70,y:34},{x:64,y:58},{x:24,y:62}
     ],
-    // Eta(0) Gamma(1) Kappa(2) Lambda(3) Iota(4) Alrescha(5)
     order:[0,1,2,3,4,5]
   },
   {
@@ -687,7 +789,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:50,y:14},{x:44,y:28},{x:36,y:44},{x:28,y:58},{x:36,y:68},{x:52,y:65},{x:64,y:56}
     ],
-    // Polaris(0) Yildun(1) Pherkad(2) GamUMi(3) BetUMi(4) DeltUMi(5) EpsUMi(6)
     order:[0,1,2,3,4,5,6]
   },
   {
@@ -696,7 +797,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:18,y:40},{x:38,y:28},{x:60,y:32},{x:75,y:45},{x:46,y:65}
     ],
-    // Algedi(0) Dabih(1) Nashira(2) Deneb(3) Omega(4)
     order:[0,1,2,3,4]
   },
   {
@@ -705,7 +805,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:24,y:44},{x:44,y:28},{x:60,y:22},{x:70,y:40},{x:38,y:65}
     ],
-    // Hadar(0) Alpha Cen(1) Eps(2) Gamma(3) Theta(4)
     order:[0,4,1,2,3]
   },
   {
@@ -714,7 +813,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:24,y:25},{x:46,y:18},{x:64,y:26},{x:70,y:50},{x:28,y:58}
     ],
-    // Alpha(0) Beta(1) Gamma(2) Delta(3) Epsilon(4)
     order:[0,1,2,3,4]
   },
   {
@@ -723,7 +821,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:50,y:16},{x:24,y:35},{x:18,y:64},{x:56,y:74},{x:80,y:50}
     ],
-    // Capella(0) Beta(1) Theta(2) Iota(3) Delta(4)
     order:[0,1,2,3,4]
   },
   {
@@ -732,7 +829,6 @@ const CONSTELLATIONS = [
     stars: [
       {x:28,y:28},{x:50,y:45},{x:68,y:58},{x:20,y:60}
     ],
-    // Fomalhaut(0) Epsilon(1) Delta(2) Beta(3)
     order:[0,1,2,3]
   }
 ];
@@ -744,15 +840,12 @@ function getDateKey() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
-
 function getDailySeed() {
   const d = new Date();
   return d.getFullYear() * 10000 + (d.getMonth()+1) * 100 + d.getDate();
 }
-
 function getTodayIndex() {
   const seed = getDailySeed();
-  // Knuth multiplicative hash — deterministic for same date, varied across days
   const h = Math.abs((seed * 2654435761) | 0) >>> 0;
   return h % CONSTELLATIONS.length;
 }
@@ -760,7 +853,7 @@ function getTodayIndex() {
 /* ════════════════════════════════════════════
    STORAGE
    ════════════════════════════════════════════ */
-const STORE_KEY = 'cosmic-connect-v2';
+const STORE_KEY = 'cosmic-connect-v3';
 
 function loadStore() {
   try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { return {}; }
@@ -768,7 +861,6 @@ function loadStore() {
 function saveStore(s) {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch {}
 }
-
 function getStreak(store) { return store.streak || 0; }
 function getLastDate(store) { return store.lastDate || ''; }
 
@@ -779,10 +871,8 @@ function recordResult(won) {
     const d = new Date(); d.setDate(d.getDate()-1);
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   })();
-
   if (!store.days) store.days = {};
   store.days[today] = { won, attempts: state.attemptsUsed };
-
   if (won) {
     store.streak = (getLastDate(store) === yesterday ? getStreak(store) : 0) + 1;
   } else {
@@ -792,18 +882,25 @@ function recordResult(won) {
   saveStore(store);
 }
 
+function isHintUsedToday() {
+  const store = loadStore();
+  return store.hintDate === getDateKey();
+}
+function markHintUsed() {
+  const store = loadStore();
+  store.hintDate = getDateKey();
+  saveStore(store);
+}
+
 /* ════════════════════════════════════════════
-   AUDIO (Web Audio API)
+   AUDIO
    ════════════════════════════════════════════ */
 let _actx = null;
 function getACtx() {
-  if (!_actx) {
-    _actx = new (window.AudioContext || window.webkitAudioContext)();
-  }
+  if (!_actx) _actx = new (window.AudioContext || window.webkitAudioContext)();
   if (_actx.state === 'suspended') _actx.resume();
   return _actx;
 }
-
 function playNote(freq, dur=0.14, vol=0.28, type='sine', when=0) {
   try {
     const ctx = getACtx();
@@ -811,24 +908,20 @@ function playNote(freq, dur=0.14, vol=0.28, type='sine', when=0) {
     const osc = ctx.createOscillator();
     const g = ctx.createGain();
     osc.connect(g); g.connect(ctx.destination);
-    osc.frequency.value = freq;
-    osc.type = type;
+    osc.frequency.value = freq; osc.type = type;
     g.gain.setValueAtTime(vol, t);
     g.gain.exponentialRampToValueAtTime(0.001, t + dur);
     osc.start(t); osc.stop(t + dur + 0.01);
   } catch(e) {}
 }
-
 function sfxCorrect() {
   playNote(523, 0.1, 0.25);
   playNote(659, 0.12, 0.22, 'sine', 0.09);
 }
-
 function sfxWrong() {
   playNote(200, 0.18, 0.3, 'sawtooth');
   playNote(155, 0.15, 0.25, 'sawtooth', 0.1);
 }
-
 function sfxComplete() {
   [523,659,784,1047].forEach((f,i) => playNote(f, 0.28, 0.25, 'sine', i*0.13));
 }
@@ -841,20 +934,18 @@ const MAX_ATTEMPTS = 5;
 const state = {
   conIdx: 0,
   constellation: null,
-  currentStep: 0,       // position in order[]
+  currentStep: 0,
   attemptsUsed: 0,
   done: false,
   won: false,
-  // canvas
   bgStars: [],
-  scaledStars: [],      // {cx, cy, r, twinklePhase, twinkleSpeed} in canvas px
-  completedLines: [],   // [{x1,y1,x2,y2}] drawn so far
-  selectedIdx: null,    // last star index confirmed
-  wrongFlash: false,    // show red flash on wrong tap
+  scaledStars: [],
+  completedLines: [],
+  wrongFlash: false,
   wrongFlashTimer: 0,
-  // animation
+  hintActive: false,
+  hintTimer: 0,
   animFrame: null,
-  startTime: 0,
 };
 
 /* ════════════════════════════════════════════
@@ -862,6 +953,11 @@ const state = {
    ════════════════════════════════════════════ */
 const canvas = document.getElementById('gameCanvas');
 const ctx    = canvas.getContext('2d');
+
+// Star radius — large for easy tapping
+const STAR_R = 17;
+// Touch hit radius — larger than visual for forgiving taps
+const HIT_R  = 36;
 
 function resizeCanvas() {
   const wrap = document.getElementById('canvasWrap');
@@ -878,22 +974,21 @@ function normToCanvas(nx, ny) {
   const dpr = window.devicePixelRatio || 1;
   const cw = canvas.width  / dpr;
   const ch = canvas.height / dpr;
-  const pad = 0.08;
+  const padX = 0.10, padY = 0.10;
   return {
-    x: pad * cw + nx * 0.01 * cw * (1 - 2*pad),
-    y: pad * ch + ny * 0.01 * ch * (1 - 2*pad)
+    x: padX * cw + nx * 0.01 * cw * (1 - 2*padX),
+    y: padY * ch + ny * 0.01 * ch * (1 - 2*padY)
   };
 }
 
 function rebuildScaledStars() {
   if (!state.constellation) return;
-  state.scaledStars = state.constellation.stars.map((s, i) => {
+  state.scaledStars = state.constellation.stars.map(s => {
     const {x, y} = normToCanvas(s.x, s.y);
     return {
       cx: x, cy: y,
-      r: 6,
-      twinklePhase: Math.random() * Math.PI * 2,
-      twinkleSpeed: 0.6 + Math.random() * 1.0,
+      twinklePhase:  Math.random() * Math.PI * 2,
+      twinkleSpeed:  0.5 + Math.random() * 0.8,
     };
   });
   generateBgStars();
@@ -903,18 +998,49 @@ function generateBgStars() {
   const dpr = window.devicePixelRatio || 1;
   const cw = canvas.width  / dpr;
   const ch = canvas.height / dpr;
-  const count = Math.floor((cw * ch) / 1800);
+  const count = Math.floor((cw * ch) / 1600);
   state.bgStars = [];
   for (let i = 0; i < count; i++) {
     state.bgStars.push({
       x: Math.random() * cw,
       y: Math.random() * ch,
-      r: 0.4 + Math.random() * 1.2,
-      alpha: 0.2 + Math.random() * 0.5,
+      r: 0.4 + Math.random() * 1.1,
+      alpha: 0.15 + Math.random() * 0.45,
       phase: Math.random() * Math.PI * 2,
-      speed: 0.3 + Math.random() * 0.8,
+      speed: 0.3 + Math.random() * 0.7,
     });
   }
+}
+
+/* ════════════════════════════════════════════
+   NUMBERED STAR HELPERS
+   ════════════════════════════════════════════ */
+
+// For a given starIdx, find the next pending click step (0-indexed)
+// Returns -1 if this star has no more pending steps
+function getNextPendingStep(starIdx) {
+  const order = state.constellation.order;
+  for (let s = state.currentStep; s < order.length; s++) {
+    if (order[s] === starIdx) return s;
+  }
+  return -1;
+}
+
+// Get the display number for a star (1-based), or null if fully done
+function getStarDisplayNum(starIdx) {
+  const step = getNextPendingStep(starIdx);
+  return step === -1 ? null : step + 1;
+}
+
+// Check if a star is fully visited (no more pending steps)
+function isStarDone(starIdx) {
+  return getNextPendingStep(starIdx) === -1;
+}
+
+// The star index expected at the current step
+function getNextStarIdx() {
+  if (state.currentStep >= state.constellation.order.length) return -1;
+  return state.constellation.order[state.currentStep];
 }
 
 /* ════════════════════════════════════════════
@@ -928,7 +1054,7 @@ function draw(ts) {
 
   ctx.clearRect(0, 0, cw, ch);
 
-  // background stars
+  // Background twinkling stars
   state.bgStars.forEach(s => {
     const tw = 0.6 + 0.4 * Math.sin(t * s.speed + s.phase);
     ctx.save();
@@ -945,13 +1071,38 @@ function draw(ts) {
     return;
   }
 
-  // completed connection lines
+  // Hint flash: all connection lines shown briefly
+  if (state.hintActive) {
+    state.hintTimer -= 1;
+    if (state.hintTimer <= 0) state.hintActive = false;
+
+    const alpha = Math.min(1, state.hintTimer / 8) * 0.55;
+    const order = state.constellation.order;
+    ctx.save();
+    ctx.strokeStyle = `rgba(255,215,0,${alpha})`;
+    ctx.lineWidth = 1.5;
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur = 6;
+    ctx.setLineDash([6, 4]);
+    for (let i = 0; i < order.length - 1; i++) {
+      const a = state.scaledStars[order[i]];
+      const b = state.scaledStars[order[i+1]];
+      ctx.beginPath();
+      ctx.moveTo(a.cx, a.cy);
+      ctx.lineTo(b.cx, b.cy);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  // Completed connection lines
   state.completedLines.forEach(ln => {
     ctx.save();
-    ctx.strokeStyle = 'rgba(167,139,250,0.55)';
-    ctx.lineWidth = 1.8;
-    ctx.shadowColor = '#a78bfa';
-    ctx.shadowBlur = 8;
+    ctx.strokeStyle = 'rgba(255,215,0,0.75)';
+    ctx.lineWidth = 2.2;
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur = 10;
     ctx.beginPath();
     ctx.moveTo(ln.x1, ln.y1);
     ctx.lineTo(ln.x2, ln.y2);
@@ -959,104 +1110,127 @@ function draw(ts) {
     ctx.restore();
   });
 
-  // wrong flash overlay
+  // Wrong flash overlay
   if (state.wrongFlash) {
     state.wrongFlashTimer -= 1;
     if (state.wrongFlashTimer <= 0) state.wrongFlash = false;
     ctx.save();
-    ctx.fillStyle = `rgba(239,68,68,${0.08 * (state.wrongFlashTimer / 10)})`;
+    ctx.fillStyle = `rgba(239,68,68,${0.09 * (state.wrongFlashTimer / 12)})`;
     ctx.fillRect(0, 0, cw, ch);
     ctx.restore();
   }
 
-  // game stars
-  const totalSteps = state.constellation.order.length;
-  const nextStarIdx = !state.done ? state.constellation.order[state.currentStep] : -1;
+  // Draw game stars
+  const nextStarIdx = getNextStarIdx();
 
   state.scaledStars.forEach((s, i) => {
-    const tw = 0.7 + 0.3 * Math.sin(t * s.twinkleSpeed + s.twinklePhase);
-    const isNext = (i === nextStarIdx);
-    const isConnected = isStarConnected(i);
-    const r = s.r;
-
-    ctx.save();
-
-    // outer glow for connected / next stars
-    if (isConnected || isNext) {
-      const glowR = r + (isNext ? 3 + 2*Math.sin(t*2.5) : 2);
-      const grd = ctx.createRadialGradient(s.cx, s.cy, 0, s.cx, s.cy, glowR * 4);
-      const col = isNext ? '#c4b5fd' : '#818cf8';
-      grd.addColorStop(0, col.replace('#','rgba(').replace(/(..)(..)(..)/, (_, r,g,b)=>
-        `${parseInt(r,16)},${parseInt(g,16)},${parseInt(b,16)}`) + `,${isNext?0.25:0.18})`);
-      grd.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = grd;
-      ctx.beginPath();
-      ctx.arc(s.cx, s.cy, glowR*4, 0, Math.PI*2);
-      ctx.fill();
-    }
-
-    // pulsing ring for next star
-    if (isNext && !state.done) {
-      const pulse = 0.5 + 0.5*Math.sin(t*3);
-      ctx.save();
-      ctx.strokeStyle = `rgba(196,181,253,${0.5 * pulse})`;
-      ctx.lineWidth = 1.5;
-      ctx.shadowColor = '#c4b5fd';
-      ctx.shadowBlur = 6;
-      ctx.beginPath();
-      ctx.arc(s.cx, s.cy, r + 6 + 4*pulse, 0, Math.PI*2);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    // star body
-    const starAlpha = tw;
-    ctx.globalAlpha = starAlpha;
-
-    if (isConnected) {
-      // bright connected star
-      ctx.shadowColor = '#a78bfa';
-      ctx.shadowBlur = 12;
-      ctx.fillStyle = '#c4b5fd';
-    } else if (isNext) {
-      ctx.shadowColor = '#e0d9ff';
-      ctx.shadowBlur = 10;
-      ctx.fillStyle = '#ede9fe';
-    } else {
-      ctx.shadowColor = 'rgba(255,255,255,0.5)';
-      ctx.shadowBlur = 5;
-      ctx.fillStyle = 'rgba(220,220,255,0.85)';
-    }
-
-    ctx.beginPath();
-    ctx.arc(s.cx, s.cy, r * (isNext || isConnected ? 1.15 : 0.9), 0, Math.PI*2);
-    ctx.fill();
-
-    // center sparkle
-    ctx.globalAlpha = 0.8 * starAlpha;
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(s.cx, s.cy, r * 0.38, 0, Math.PI*2);
-    ctx.fill();
-
-    ctx.restore();
+    drawGameStar(s, i, nextStarIdx, t);
   });
 
   state.animFrame = requestAnimationFrame(draw);
 }
 
-/* Check if a star index has been fully connected (appears in completedLines) */
-function isStarConnected(idx) {
-  // A star is "lit" if it's the last confirmed star (selectedIdx)
-  // or it appears in any completed line
-  if (state.selectedIdx === idx) return true;
-  return state.completedLines.some(ln => {
-    const s = state.scaledStars;
-    const matches = (px, py, si) => Math.abs(s[si].cx - px) < 0.5 && Math.abs(s[si].cy - py) < 0.5;
-    // Check if this line endpoint matches star idx
-    return (Math.round(ln.x1) === Math.round(s[idx].cx) && Math.round(ln.y1) === Math.round(s[idx].cy)) ||
-           (Math.round(ln.x2) === Math.round(s[idx].cx) && Math.round(ln.y2) === Math.round(s[idx].cy));
-  });
+function drawGameStar(s, starIdx, nextStarIdx, t) {
+  const { cx, cy } = s;
+  const displayNum = getStarDisplayNum(starIdx);
+  const isDone = displayNum === null;
+  const isNext = (!state.done) && (starIdx === nextStarIdx);
+
+  ctx.save();
+
+  // --- Outer ambient glow ---
+  const glowR = STAR_R * 3.5;
+  const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR);
+  if (isDone) {
+    grd.addColorStop(0, 'rgba(255,215,0,0.22)');
+  } else if (isNext) {
+    const pulse = 0.5 + 0.5 * Math.sin(t * 2.8);
+    grd.addColorStop(0, `rgba(196,181,253,${0.28 + 0.12*pulse})`);
+  } else {
+    grd.addColorStop(0, 'rgba(100,80,180,0.10)');
+  }
+  grd.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = grd;
+  ctx.beginPath();
+  ctx.arc(cx, cy, glowR, 0, Math.PI*2);
+  ctx.fill();
+
+  // --- Pulsing outer ring for next star ---
+  if (isNext && !state.done) {
+    const pulse = 0.5 + 0.5 * Math.sin(t * 3.2);
+    const ringR = STAR_R + 8 + 4 * pulse;
+    ctx.strokeStyle = `rgba(255,215,0,${0.65 * pulse})`;
+    ctx.lineWidth = 2;
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    ctx.arc(cx, cy, ringR, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+
+  // --- Star body ---
+  ctx.beginPath();
+  ctx.arc(cx, cy, STAR_R, 0, Math.PI*2);
+
+  if (isDone) {
+    ctx.fillStyle = 'rgba(255,200,0,0.88)';
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur = 18;
+  } else if (isNext) {
+    ctx.fillStyle = 'rgba(55,28,110,0.96)';
+    ctx.shadowColor = '#c4b5fd';
+    ctx.shadowBlur = 14;
+  } else {
+    ctx.fillStyle = 'rgba(12,6,35,0.88)';
+    ctx.shadowBlur = 0;
+  }
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // --- Border ---
+  ctx.beginPath();
+  ctx.arc(cx, cy, STAR_R, 0, Math.PI*2);
+  if (isDone) {
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 2.5;
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur = 8;
+  } else if (isNext) {
+    ctx.strokeStyle = '#c4b5fd';
+    ctx.lineWidth = 2.5;
+    ctx.shadowColor = '#c4b5fd';
+    ctx.shadowBlur = 10;
+  } else {
+    ctx.strokeStyle = 'rgba(167,139,250,0.55)';
+    ctx.lineWidth = 1.5;
+    ctx.shadowBlur = 0;
+  }
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // --- Number or checkmark label ---
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  if (isDone) {
+    // Completed — show checkmark
+    ctx.fillStyle = 'rgba(30,15,0,0.9)';
+    ctx.font = `bold 13px "Orbitron", monospace`;
+    ctx.fillText('✓', cx, cy);
+  } else {
+    const numStr = String(displayNum);
+    const fontSize = numStr.length > 1 ? 11 : 13;
+    ctx.font = `bold ${fontSize}px "Orbitron", monospace`;
+    ctx.fillStyle = isNext ? '#ffffff' : 'rgba(210,195,255,0.92)';
+    // Subtle text shadow for legibility
+    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+    ctx.shadowBlur = 3;
+    ctx.fillText(numStr, cx, cy);
+    ctx.shadowBlur = 0;
+  }
+
+  ctx.restore();
 }
 
 /* ════════════════════════════════════════════
@@ -1064,25 +1238,26 @@ function isStarConnected(idx) {
    ════════════════════════════════════════════ */
 function getCanvasPos(e) {
   const rect = canvas.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
   let cx, cy;
   if (e.touches) {
-    const t = e.touches[0] || e.changedTouches[0];
-    cx = t.clientX - rect.left;
-    cy = t.clientY - rect.top;
+    const touch = e.touches[0] || e.changedTouches[0];
+    cx = touch.clientX - rect.left;
+    cy = touch.clientY - rect.top;
   } else {
     cx = e.clientX - rect.left;
     cy = e.clientY - rect.top;
   }
-  return { x: cx, y: cy };
+  // Scale to CSS px (canvas might be retina)
+  const scaleX = rect.width  / (canvas.width  / (window.devicePixelRatio || 1));
+  const scaleY = rect.height / (canvas.height / (window.devicePixelRatio || 1));
+  return { x: cx / scaleX, y: cy / scaleY };
 }
 
 function findNearestStar(px, py) {
   let best = null, bestDist = Infinity;
-  const threshold = 44; // px touch radius
   state.scaledStars.forEach((s, i) => {
     const d = Math.hypot(s.cx - px, s.cy - py);
-    if (d < threshold && d < bestDist) {
+    if (d < HIT_R && d < bestDist) {
       bestDist = d; best = i;
     }
   });
@@ -1092,6 +1267,7 @@ function findNearestStar(px, py) {
 function handleTap(e) {
   e.preventDefault();
   if (state.done) return;
+
   const {x, y} = getCanvasPos(e);
   const starIdx = findNearestStar(x, y);
   if (starIdx === null) return;
@@ -1099,58 +1275,97 @@ function handleTap(e) {
   const expected = state.constellation.order[state.currentStep];
 
   if (starIdx === expected) {
-    // ── CORRECT ──
+    // ── CORRECT TAP ──
     sfxCorrect();
 
-    // Draw line from last confirmed star to this one
+    // Draw golden line from previous star to this one
     if (state.currentStep > 0) {
       const prevIdx = state.constellation.order[state.currentStep - 1];
       const prev = state.scaledStars[prevIdx];
       const curr = state.scaledStars[starIdx];
-      state.completedLines.push({
-        x1: prev.cx, y1: prev.cy,
-        x2: curr.cx, y2: curr.cy,
-      });
+      state.completedLines.push({ x1: prev.cx, y1: prev.cy, x2: curr.cx, y2: curr.cy });
     }
-    state.selectedIdx = starIdx;
+
     state.currentStep++;
 
     if (state.currentStep >= state.constellation.order.length) {
-      // ── PUZZLE COMPLETE ──
       onComplete();
     } else {
-      updateStepsUI();
+      updateStepUI();
     }
+
   } else {
-    // ── WRONG ──
+    // ── WRONG TAP ──
     sfxWrong();
     state.attemptsUsed++;
     state.wrongFlash = true;
-    state.wrongFlashTimer = 18;
+    state.wrongFlashTimer = 20;
 
-    // Shake the canvas wrap
     const wrap = document.getElementById('canvasWrap');
     wrap.classList.remove('shake');
     void wrap.offsetWidth;
     wrap.classList.add('shake');
 
     // Reset progress
-    state.currentStep = 0;
+    state.currentStep  = 0;
     state.completedLines = [];
-    state.selectedIdx = null;
 
     updateAttemptsUI();
+    updateStepUI();
 
     if (state.attemptsUsed >= MAX_ATTEMPTS) {
       onFail();
     } else {
-      showToast(`✗ Not quite — ${MAX_ATTEMPTS - state.attemptsUsed} attempt${MAX_ATTEMPTS - state.attemptsUsed === 1 ? '' : 's'} left`, 'err');
+      const left = MAX_ATTEMPTS - state.attemptsUsed;
+      showToast(`✗ Wrong star — ${left} attempt${left === 1 ? '' : 's'} left`, 'err');
     }
   }
 }
 
 canvas.addEventListener('touchstart', handleTap, {passive: false});
 canvas.addEventListener('click', handleTap);
+
+/* ════════════════════════════════════════════
+   HINT FEATURE
+   ════════════════════════════════════════════ */
+function useHint() {
+  if (state.done) return;
+  if (isHintUsedToday()) {
+    showToast('Hint already used today!', 'neutral');
+    return;
+  }
+  markHintUsed();
+  updateHintButton();
+
+  // Flash all connection lines for ~2.5 seconds (150 frames at 60fps)
+  state.hintActive = true;
+  state.hintTimer = 160;
+  showToast('✨ Here\'s the full path — study it!', 'ok');
+}
+
+function updateHintButton() {
+  const btn = document.getElementById('hintBtn');
+  if (isHintUsedToday() || state.done) {
+    btn.disabled = true;
+    btn.textContent = '💡 Hint used';
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = '💡 Hint';
+  }
+}
+
+/* ════════════════════════════════════════════
+   TUTORIAL
+   ════════════════════════════════════════════ */
+function showTutorialIfNeeded() {
+  if (!localStorage.getItem('cosmic_tutorial_seen')) {
+    showOverlay('tutorialOverlay');
+  }
+}
+function dismissTutorial() {
+  localStorage.setItem('cosmic_tutorial_seen', '1');
+  hideOverlays();
+}
 
 /* ════════════════════════════════════════════
    GAME FLOW
@@ -1161,29 +1376,30 @@ function onComplete() {
   sfxComplete();
   recordResult(true);
 
-  // Draw all remaining lines for celebration (constellation fully lit)
-  // We already drew up to currentStep-1 lines, so this is complete.
+  updateHintButton();
 
   setTimeout(() => {
     buildShareText();
-    showOverlay('successOverlay');
     updateStreakBadge();
+    drawWinCanvas();
+    showOverlay('successOverlay');
 
     const sub = document.getElementById('successSub');
     const att = state.attemptsUsed;
-    const perfect = att === 0;
-    sub.textContent = perfect
-      ? `Perfect! First try — you're a star navigator! 🌟`
-      : att === 1
-      ? `Brilliant! You only needed ${MAX_ATTEMPTS - att} of ${MAX_ATTEMPTS} attempts.`
-      : `You traced ${state.constellation.name} in ${att === 0 ? 'one try' : `${MAX_ATTEMPTS - att} attempts left`}.`;
-  }, 600);
+    if (att === 0) {
+      sub.textContent = `Perfect first try — you're a master navigator! ✨`;
+    } else {
+      const left = MAX_ATTEMPTS - att;
+      sub.textContent = `You traced ${state.constellation.name} with ${left} attempt${left === 1 ? '' : 's'} to spare!`;
+    }
+  }, 700);
 }
 
 function onFail() {
   state.done = true;
   state.won  = false;
   recordResult(false);
+  updateHintButton();
 
   setTimeout(() => {
     buildShareText();
@@ -1192,6 +1408,88 @@ function onFail() {
     showOverlay('failOverlay');
     updateStreakBadge();
   }, 500);
+}
+
+/* Win canvas — draws the completed constellation */
+function drawWinCanvas() {
+  const wc = document.getElementById('winCanvas');
+  const wctx = wc.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const wrap = wc.parentElement;
+  const W = wrap.clientWidth;
+  const H = wrap.clientHeight;
+  wc.width  = W * dpr;
+  wc.height = H * dpr;
+  wctx.scale(dpr, dpr);
+
+  // Background
+  wctx.fillStyle = 'rgba(3,6,24,0.7)';
+  wctx.fillRect(0, 0, W, H);
+
+  // Small bg stars
+  for (let i = 0; i < 50; i++) {
+    wctx.globalAlpha = 0.15 + Math.random() * 0.3;
+    wctx.fillStyle = '#fff';
+    wctx.beginPath();
+    wctx.arc(Math.random()*W, Math.random()*H, 0.4 + Math.random()*0.9, 0, Math.PI*2);
+    wctx.fill();
+  }
+  wctx.globalAlpha = 1;
+
+  // Build positions for win canvas
+  const c = state.constellation;
+  const padX = 0.12, padY = 0.12;
+  function norm(nx, ny) {
+    return {
+      x: padX * W + nx * 0.01 * W * (1 - 2*padX),
+      y: padY * H + ny * 0.01 * H * (1 - 2*padY)
+    };
+  }
+
+  // Draw all connection lines
+  const order = c.order;
+  wctx.save();
+  wctx.strokeStyle = 'rgba(255,215,0,0.8)';
+  wctx.lineWidth = 1.8;
+  wctx.shadowColor = '#FFD700';
+  wctx.shadowBlur = 8;
+  for (let i = 0; i < order.length - 1; i++) {
+    const a = norm(c.stars[order[i]].x, c.stars[order[i]].y);
+    const b = norm(c.stars[order[i+1]].x, c.stars[order[i+1]].y);
+    wctx.beginPath();
+    wctx.moveTo(a.x, a.y);
+    wctx.lineTo(b.x, b.y);
+    wctx.stroke();
+  }
+  wctx.restore();
+
+  // Draw stars
+  const r = 7;
+  c.stars.forEach(s => {
+    const {x, y} = norm(s.x, s.y);
+    wctx.save();
+    wctx.fillStyle = '#FFD700';
+    wctx.shadowColor = '#FFD700';
+    wctx.shadowBlur = 12;
+    wctx.beginPath();
+    wctx.arc(x, y, r, 0, Math.PI*2);
+    wctx.fill();
+    wctx.fillStyle = '#fff';
+    wctx.shadowBlur = 0;
+    wctx.beginPath();
+    wctx.arc(x, y, r * 0.4, 0, Math.PI*2);
+    wctx.fill();
+    wctx.restore();
+  });
+
+  // Constellation name
+  wctx.save();
+  wctx.fillStyle = 'rgba(255,215,0,0.8)';
+  wctx.font = `600 12px "Orbitron", monospace`;
+  wctx.textAlign = 'center';
+  wctx.textBaseline = 'bottom';
+  wctx.fillText(c.name.toUpperCase(), W/2, H - 8);
+  wctx.restore();
 }
 
 /* ════════════════════════════════════════════
@@ -1207,10 +1505,19 @@ function updateAttemptsUI() {
   }
 }
 
-function updateStepsUI() {
+function updateStepUI() {
   const total = state.constellation.order.length;
   const done  = state.currentStep;
-  document.getElementById('stepsVal').textContent = done > 0 ? `${done}/${total} ✓` : '';
+  const prog  = document.getElementById('stepProgress');
+  prog.textContent = done > 0 ? `✓ ${done} / ${total}` : `0 / ${total}`;
+
+  // Next indicator
+  const ind = document.getElementById('nextIndicator');
+  if (!state.done && done < total) {
+    ind.innerHTML = `Click star <strong>${done + 1}</strong> — it's glowing`;
+  } else if (state.done) {
+    ind.textContent = '';
+  }
 }
 
 function updateStreakBadge() {
@@ -1222,7 +1529,6 @@ function showOverlay(id) {
   document.querySelectorAll('.overlay').forEach(o => o.classList.remove('show'));
   document.getElementById(id).classList.add('show');
 }
-
 function hideOverlays() {
   document.querySelectorAll('.overlay').forEach(o => o.classList.remove('show'));
 }
@@ -1238,7 +1544,6 @@ function buildShareText() {
   const won = state.won;
   const today = getDateKey();
 
-  // Emoji row: ⭐ = wrong attempt, 🌟 = successful completion
   let emojiRow = '';
   if (won) {
     for (let i = 0; i < att; i++) emojiRow += '⭐';
@@ -1249,31 +1554,21 @@ function buildShareText() {
   }
 
   const label = won
-    ? `Cosmic Connect ${today} ${c.emoji}\n${emojiRow}\nSolved in ${MAX_ATTEMPTS - att}/${MAX_ATTEMPTS} attempts!`
+    ? `Cosmic Connect ${today} ${c.emoji}\n${emojiRow}\nTraced in ${att+1}/${MAX_ATTEMPTS} attempt${att+1===1?'':'s'}!`
     : `Cosmic Connect ${today} ${c.emoji}\n${emojiRow}\nBetter luck tomorrow!`;
 
   _shareText = `${label}\n\ncosmicconnect.cerebra.app`;
 
-  // Update all share boxes
   ['shareEmojis','doneEmojis'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = emojiRow;
   });
-
   ['shareLabel','doneLabel'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = won
       ? `${c.name} • ${MAX_ATTEMPTS - att} attempt${MAX_ATTEMPTS - att === 1 ? '' : 's'} remaining`
       : `${c.name} • Better luck tomorrow`;
   });
-
-  const successSub = document.getElementById('successSub');
-  if (successSub && won) {
-    const left = MAX_ATTEMPTS - att;
-    successSub.textContent = att === 0
-      ? `First try! You're a true star navigator. ✨`
-      : `Connected in ${att+1} ${att+1===1?'attempt':'attempts'} with ${left} to spare.`;
-  }
 }
 
 function copyShare() {
@@ -1281,7 +1576,6 @@ function copyShare() {
   navigator.clipboard.writeText(_shareText)
     .then(() => showToast('Copied to clipboard!', 'ok'))
     .catch(() => {
-      // fallback
       const ta = document.createElement('textarea');
       ta.value = _shareText;
       document.body.appendChild(ta);
@@ -1300,7 +1594,6 @@ function joinCerebra(inputId, okId) {
     showToast('Please enter a valid email', 'err');
     return;
   }
-  // Store locally (no backend — graceful for single-file game)
   try {
     const subs = JSON.parse(localStorage.getItem('cerebra-subs') || '[]');
     if (!subs.includes(email)) subs.push(email);
@@ -1319,7 +1612,7 @@ function showToast(msg, type='neutral') {
   el.textContent = msg;
   el.className = `toast ${type} show`;
   if (_toastTimer) clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
 }
 
 /* ════════════════════════════════════════════
@@ -1328,57 +1621,52 @@ function showToast(msg, type='neutral') {
 function init() {
   const store = loadStore();
   const today = getDateKey();
-  state.conIdx = getTodayIndex();
+  state.conIdx       = getTodayIndex();
   state.constellation = CONSTELLATIONS[state.conIdx];
 
-  // Display constellation info
-  document.getElementById('constName').textContent = state.constellation.name;
-  document.getElementById('constDesc').textContent = state.constellation.description;
+  // Header info
+  document.getElementById('constName').textContent  = state.constellation.name;
+  document.getElementById('constDesc').textContent  = state.constellation.description;
+  document.getElementById('constTask').textContent  =
+    `Connect the stars in order to trace ${state.constellation.name}`;
 
   updateStreakBadge();
   updateAttemptsUI();
-  updateStepsUI();
+  updateStepUI();
+  updateHintButton();
 
-  // Has the player already played today?
+  // Already played today?
   if (store.days && store.days[today]) {
     const prev = store.days[today];
-    state.done = true;
-    state.won  = prev.won;
+    state.done         = true;
+    state.won          = prev.won;
     state.attemptsUsed = prev.attempts || 0;
     buildShareText();
 
-    // Show relevant overlay after a moment
     setTimeout(() => {
       if (prev.won) {
+        drawWinCanvas();
         showOverlay('doneOverlay');
         document.getElementById('doneSub').textContent =
-          `You already traced ${state.constellation.name} today! Come back tomorrow for a new puzzle.`;
+          `You already traced ${state.constellation.name} today! A new constellation awaits tomorrow.`;
       } else {
         showOverlay('failOverlay');
         document.getElementById('failRevealName').textContent = state.constellation.name;
         document.getElementById('failRevealDesc').textContent = state.constellation.description;
       }
     }, 800);
+  } else {
+    // Show tutorial on first ever visit
+    setTimeout(showTutorialIfNeeded, 300);
   }
 
-  // Size canvas
+  // Size and start canvas
   resizeCanvas();
-
-  // Start animation
   if (state.animFrame) cancelAnimationFrame(state.animFrame);
-  state.startTime = performance.now();
   state.animFrame = requestAnimationFrame(draw);
-
-  // Hint text
-  document.getElementById('hintText').textContent =
-    `Tap stars in order to trace ${state.constellation.name} — ${state.constellation.order.length} clicks`;
 }
 
-window.addEventListener('resize', () => {
-  resizeCanvas();
-});
-
-// Boot
+window.addEventListener('resize', () => { resizeCanvas(); });
 window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
