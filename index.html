@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#030618">
+  <title>Cosmic Connect</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0; padding: 0; box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --purple: #a78bfa;
+      --purple-deep: #7c3aed;
+      --blue: #60a5fa;
+      --bg: #030618;
+      --card: rgba(12, 8, 35, 0.95);
+      --text: #e8e8f0;
+      --muted: rgba(232, 232, 240, 0.45);
+      --border: rgba(167, 139, 250, 0.18);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Nebula background */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 15% 50%, rgba(30,10,80,0.55) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 85% 20%, rgba(10,5,60,0.45) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 60% at 50% 100%, rgba(40,5,80,0.35) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .container {
+      width: 100%; max-width: 480px;
+      min-height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 0 16px;
+      position: relative; z-index: 1;
+    }
+
+    /* ── HEADER ── */
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0 10px;
+    }
+
+    .logo {
+      font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #c4b5fd, #818cf8, #67e8f9);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .logo span { font-weight: 300; opacity: 0.7; }
+
+    .streak-badge {
+      display: flex; align-items: center; gap: 5px;
+      background: rgba(167,139,250,0.08);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 5px 12px;
+      font-size: 13px; font-weight: 500; color: var(--purple);
+      cursor: default; user-select: none;
+    }
+
+    /* ── CONSTELLATION INFO ── */
+    .const-info {
+      text-align: center; padding: 6px 0 12px;
+    }
+
+    .const-name {
+      font-size: 28px; font-weight: 700; letter-spacing: -0.5px;
+      line-height: 1.1; margin-bottom: 5px;
+    }
+
+    .const-desc {
+      font-size: 13px; color: var(--muted); font-weight: 300;
+      line-height: 1.4; padding: 0 12px;
+    }
+
+    /* ── ATTEMPTS ── */
+    .attempts-row {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; padding: 6px 0 8px;
+      font-size: 12px; color: var(--muted); letter-spacing: 0.3px;
+    }
+
+    .attempt-pips {
+      display: flex; gap: 5px;
+    }
+
+    .pip {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: rgba(232,232,240,0.15);
+      transition: all 0.35s ease;
+    }
+    .pip.used { background: rgba(239,68,68,0.55); box-shadow: 0 0 6px rgba(239,68,68,0.3); }
+    .pip.ok   { background: rgba(167,139,250,0.6); box-shadow: 0 0 6px rgba(167,139,250,0.3); }
+
+    /* ── CANVAS ── */
+    .canvas-wrap {
+      position: relative; width: 100%;
+      flex: 1; min-height: 300px; max-height: 460px;
+    }
+
+    #gameCanvas {
+      display: block; width: 100%; height: 100%;
+      cursor: crosshair; touch-action: none;
+      border-radius: 18px;
+      background: rgba(3,6,24,0.5);
+      border: 1px solid rgba(167,139,250,0.08);
+    }
+
+    /* Wrong-click shake on canvas wrapper */
+    @keyframes shake {
+      0%,100%{transform:translateX(0)}
+      15%{transform:translateX(-8px)}
+      30%{transform:translateX(8px)}
+      45%{transform:translateX(-6px)}
+      60%{transform:translateX(6px)}
+      75%{transform:translateX(-3px)}
+      90%{transform:translateX(3px)}
+    }
+    .shake { animation: shake 0.45s ease; }
+
+    /* ── BOTTOM HINT ── */
+    .hint {
+      text-align: center; font-size: 12px; color: rgba(232,232,240,0.22);
+      padding: 7px 0; letter-spacing: 0.3px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center; padding: 10px 0 16px;
+      font-size: 11px; color: rgba(232,232,240,0.18);
+      letter-spacing: 0.8px; text-transform: uppercase;
+    }
+
+    /* ── OVERLAYS ── */
+    .overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      align-items: center; justify-content: center;
+      padding: 20px;
+      background: rgba(3,6,24,0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .overlay.show { display: flex; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 30px 22px;
+      width: 100%; max-width: 360px;
+      text-align: center;
+      animation: cardIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    @keyframes cardIn {
+      from { opacity:0; transform: scale(0.85) translateY(20px); }
+      to   { opacity:1; transform: scale(1)   translateY(0); }
+    }
+
+    .card-icon { font-size: 54px; display: block; margin-bottom: 14px; }
+
+    .card-title {
+      font-size: 24px; font-weight: 700; letter-spacing: -0.4px;
+      margin-bottom: 6px;
+    }
+
+    .card-sub {
+      font-size: 13px; color: var(--muted); line-height: 1.55;
+      margin-bottom: 22px;
+    }
+
+    /* Share box */
+    .share-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px; padding: 16px;
+      font-size: 22px; line-height: 1.7; letter-spacing: 3px;
+      margin-bottom: 6px;
+    }
+
+    .share-label {
+      font-size: 11px; color: rgba(232,232,240,0.3);
+      margin-bottom: 20px; letter-spacing: 0.3px;
+    }
+
+    /* Buttons */
+    .btn-row { display: flex; flex-direction: column; gap: 9px; margin-bottom: 18px; }
+
+    .btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 13px 24px; border-radius: 12px;
+      font-family: inherit; font-size: 14px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.2s ease;
+      letter-spacing: -0.1px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 26px rgba(124,58,237,0.4); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-ghost {
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      border: 1px solid rgba(255,255,255,0.09);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+
+    /* Reveal box */
+    .reveal-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 14px;
+      margin-bottom: 18px;
+    }
+    .reveal-label { font-size: 10px; color: rgba(232,232,240,0.3); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+    .reveal-name  { font-size: 20px; font-weight: 600; }
+    .reveal-desc  { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* Email opt-in */
+    .optin {
+      background: rgba(167,139,250,0.05);
+      border: 1px solid rgba(167,139,250,0.12);
+      border-radius: 16px; padding: 16px;
+    }
+
+    .optin p {
+      font-size: 13px; color: rgba(232,232,240,0.55);
+      margin-bottom: 11px; line-height: 1.45;
+    }
+    .optin p strong { color: var(--purple); font-weight: 600; }
+
+    .email-row { display: flex; gap: 7px; }
+
+    .email-input {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px; padding: 9px 13px;
+      color: var(--text); font-family: inherit; font-size: 13px;
+      outline: none; transition: border-color 0.2s;
+    }
+    .email-input:focus { border-color: rgba(167,139,250,0.4); }
+    .email-input::placeholder { color: rgba(232,232,240,0.2); }
+
+    .btn-join {
+      background: rgba(167,139,250,0.15);
+      border: 1px solid rgba(167,139,250,0.25);
+      color: var(--purple); border-radius: 10px;
+      padding: 9px 15px; font-family: inherit;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-join:hover { background: rgba(167,139,250,0.25); }
+
+    .email-ok {
+      font-size: 12px; color: #6ee7b7;
+      margin-top: 8px; display: none;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; top: 18px; left: 50%;
+      transform: translateX(-50%) translateY(-80px);
+      background: rgba(12,8,35,0.97);
+      border: 1px solid rgba(167,139,250,0.25);
+      border-radius: 12px; padding: 11px 20px;
+      font-size: 13px; font-weight: 500; z-index: 300;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      white-space: nowrap; pointer-events: none;
+    }
+    .toast.show    { transform: translateX(-50%) translateY(0); }
+    .toast.err     { border-color: rgba(239,68,68,0.35); color: #fca5a5; }
+    .toast.ok      { border-color: rgba(52,211,153,0.35); color: #6ee7b7; }
+    .toast.neutral { color: var(--text); }
+
+    /* ── STEP COUNTER ── */
+    .steps-label {
+      font-size: 11px; color: var(--muted); letter-spacing: 0.3px;
+    }
+    .steps-val {
+      font-size: 11px; color: var(--purple); font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="logo">✦ Cosmic<span>Connect</span></div>
+    <div class="streak-badge" id="streakBadge">🔥 <span id="streakNum">0</span></div>
+  </header>
+
+  <div class="const-info">
+    <div class="const-name" id="constName">Loading…</div>
+    <div class="const-desc" id="constDesc"></div>
+  </div>
+
+  <div class="attempts-row">
+    <span class="steps-label">Attempts</span>
+    <div class="attempt-pips" id="pips"></div>
+    <span class="steps-val" id="stepsVal"></span>
+  </div>
+
+  <div class="canvas-wrap" id="canvasWrap">
+    <canvas id="gameCanvas"></canvas>
+  </div>
+
+  <div class="hint" id="hintText">Tap the stars in the right order to trace the constellation</div>
+
+  <footer>A CEREBRA Game</footer>
+</div>
+
+<!-- ═══ SUCCESS OVERLAY ═══ -->
+<div class="overlay" id="successOverlay">
+  <div class="card">
+    <span class="card-icon">🌟</span>
+    <div class="card-title">Constellation Traced!</div>
+    <div class="card-sub" id="successSub">You connected the stars beautifully.</div>
+
+    <div class="share-box" id="shareEmojis"></div>
+    <div class="share-label" id="shareLabel"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="copyShare()">📋 Copy Score</button>
+    </div>
+
+    <div class="optin">
+      <p>✨ Get a new constellation every day — <strong>join CEREBRA</strong></p>
+      <div class="email-row">
+        <input type="email" class="email-input" id="emailSuccess" placeholder="your@email.com">
+        <button class="btn-join" onclick="joinCerebra('emailSuccess', 'okSuccess')">Join →</button>
+      </div>
+      <div class="email-ok" id="okSuccess">✓ Welcome aboard — see you tomorrow!</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FAILURE OVERLAY ═══ -->
+<div class="overlay" id="failOverlay">
+  <div class="card">
+    <span class="card-icon">💫</span>
+    <div class="card-title">Out of Attempts</div>
+    <div class="card-sub">The stars weren't aligned today. Come back tomorrow!</div>
+
+    <div class="reveal-box">
+      <div class="reveal-label">Today's Constellation</div>
+      <div class="reveal-name" id="failRevealName"></div>
+      <div class="reveal-desc" id="failRevealDesc"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="copyShare()">📋 Share Result</button>
+    </div>
+
+    <div class="optin">
+      <p>✨ Get a new constellation every day — <strong>join CEREBRA</strong></p>
+      <div class="email-row">
+        <input type="email" class="email-input" id="emailFail" placeholder="your@email.com">
+        <button class="btn-join" onclick="joinCerebra('emailFail', 'okFail')">Join →</button>
+      </div>
+      <div class="email-ok" id="okFail">✓ Welcome aboard — see you tomorrow!</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ALREADY PLAYED OVERLAY ═══ -->
+<div class="overlay" id="doneOverlay">
+  <div class="card">
+    <span class="card-icon">🌙</span>
+    <div class="card-title">Come Back Tomorrow</div>
+    <div class="card-sub" id="doneSub">You've already played today's puzzle. A new constellation awaits tomorrow!</div>
+
+    <div class="share-box" id="doneEmojis"></div>
+    <div class="share-label" id="doneLabel"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="copyShare()">📋 Copy Score</button>
+    </div>
+
+    <div class="optin">
+      <p>✨ Never miss a puzzle — <strong>join CEREBRA</strong></p>
+      <div class="email-row">
+        <input type="email" class="email-input" id="emailDone" placeholder="your@email.com">
+        <button class="btn-join" onclick="joinCerebra('emailDone', 'okDone')">Join →</button>
+      </div>
+      <div class="email-ok" id="okDone">✓ Welcome aboard — see you tomorrow!</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ════════════════════════════════════════════
+   CONSTELLATION DATA  (35 constellations)
+   Stars: x,y in 0–100 normalised grid
+   order: click sequence of star indices
+   (repeated indices = revisit that star)
+   ════════════════════════════════════════════ */
+const CONSTELLATIONS = [
+  {
+    name: "Orion", emoji: "🏹",
+    description: "The Hunter — one of the most recognizable constellations in the winter sky",
+    stars: [
+      {x:34,y:20},{x:65,y:18},{x:36,y:52},{x:50,y:50},{x:64,y:48},{x:38,y:80},{x:63,y:82}
+    ],
+    // Betelgeuse(0) Bellatrix(1) Alnitak(2) Alnilam(3) Mintaka(4) Saiph(5) Rigel(6)
+    order:[0,2,3,4,1,6,5]
+  },
+  {
+    name: "Ursa Major", emoji: "🐻",
+    description: "The Great Bear — home to the famous Big Dipper asterism",
+    stars: [
+      {x:18,y:42},{x:30,y:37},{x:43,y:33},{x:55,y:36},{x:62,y:57},{x:74,y:60},{x:70,y:36}
+    ],
+    // Alkaid(0) Mizar(1) Alioth(2) Megrez(3) Phecda(4) Merak(5) Dubhe(6)
+    order:[0,1,2,3,6,5,4]
+  },
+  {
+    name: "Cassiopeia", emoji: "👑",
+    description: "The Queen — famous for its distinctive W shape in the northern sky",
+    stars: [
+      {x:14,y:62},{x:30,y:33},{x:50,y:57},{x:68,y:27},{x:83,y:50}
+    ],
+    // Segin(0) Ruchbah(1) Gamma-Cas(2) Schedar(3) Caph(4)
+    order:[0,1,2,3,4]
+  },
+  {
+    name: "Leo", emoji: "🦁",
+    description: "The Lion — a bold zodiac constellation with the bright star Regulus",
+    stars: [
+      {x:22,y:72},{x:35,y:50},{x:44,y:28},{x:57,y:35},{x:68,y:50},{x:78,y:68}
+    ],
+    // Regulus(0) Eta(1) Algieba(2) Adhafera(3) Zosma(4) Denebola(5)
+    order:[0,1,2,3,4,5]
+  },
+  {
+    name: "Scorpius", emoji: "🦂",
+    description: "The Scorpion — summer king with glowing red Antares at its heart",
+    stars: [
+      {x:42,y:12},{x:52,y:25},{x:44,y:38},{x:36,y:52},{x:40,y:65},{x:50,y:75},{x:60,y:68},{x:65,y:55}
+    ],
+    // Graffias(0) Dschubba(1) Antares(2) Tau(3) Shaula(4) Lesath(5) Girtab(6) Sargas(7)
+    order:[0,1,2,3,4,5,6,7]
+  },
+  {
+    name: "Gemini", emoji: "♊",
+    description: "The Twins — Castor and Pollux shine at the head of these celestial brothers",
+    stars: [
+      {x:24,y:18},{x:40,y:18},{x:22,y:42},{x:38,y:43},{x:22,y:68},{x:40,y:68}
+    ],
+    // Castor(0) Pollux(1) Mebsuda(2) Wasat(3) Tejat(4) Alhena(5)
+    order:[0,2,4,5,3,1]
+  },
+  {
+    name: "Aquarius", emoji: "🏺",
+    description: "The Water Bearer — ancient zodiac constellation pouring cosmic waters",
+    stars: [
+      {x:34,y:22},{x:56,y:27},{x:42,y:42},{x:62,y:52},{x:48,y:64},{x:70,y:72}
+    ],
+    // Sadalsuud(0) Sadalmelik(1) Sadachbia(2) Skat(3) Eta(4) Albali(5)
+    order:[0,2,1,3,4,5]
+  },
+  {
+    name: "Taurus", emoji: "🐂",
+    description: "The Bull — home to the V-shaped Hyades cluster and red-eyed Aldebaran",
+    stars: [
+      {x:20,y:55},{x:35,y:38},{x:48,y:28},{x:56,y:42},{x:60,y:62},{x:72,y:44}
+    ],
+    // Aldebaran(0) Hyadum(1) Ain(2) Prima(3) Theta(4) Alcyone(5)
+    order:[0,1,2,3,4,5]
+  },
+  {
+    name: "Perseus", emoji: "⚔️",
+    description: "The Hero — slayer of Medusa and rescuer of Andromeda",
+    stars: [
+      {x:18,y:58},{x:30,y:75},{x:44,y:60},{x:56,y:45},{x:63,y:30},{x:73,y:17}
+    ],
+    // Delta(0) Mirfak(1) Algol(2) Rho(3) Theta(4) Iota(5)
+    order:[0,1,2,3,4,5]
+  },
+  {
+    name: "Lyra", emoji: "🎵",
+    description: "The Lyre — home to brilliant Vega, fifth brightest star in the sky",
+    stars: [
+      {x:50,y:16},{x:34,y:44},{x:58,y:42},{x:30,y:68},{x:62,y:66}
+    ],
+    // Vega(0) Zeta(1) Epsilon(2) Beta(3) Gamma(4)
+    order:[0,2,4,3,1,0]
+  },
+  {
+    name: "Cygnus", emoji: "🦢",
+    description: "The Swan — the Northern Cross soaring along the summer Milky Way",
+    stars: [
+      {x:50,y:12},{x:50,y:40},{x:20,y:40},{x:80,y:40},{x:50,y:68},{x:50,y:84}
+    ],
+    // Deneb(0) Sadr(1) Gienah(2) Delta(3) Eta(4) Albireo(5)
+    order:[2,1,3,1,0,1,4,5]
+  },
+  {
+    name: "Aquila", emoji: "🦅",
+    description: "The Eagle — soaring beside the Milky Way with bright Altair at its neck",
+    stars: [
+      {x:50,y:18},{x:36,y:34},{x:63,y:37},{x:28,y:57},{x:74,y:60}
+    ],
+    // Altair(0) Tarazed(1) Alshain(2) Eta(3) Theta(4)
+    order:[3,1,0,2,4]
+  },
+  {
+    name: "Draco", emoji: "🐉",
+    description: "The Dragon — a constellation that winds around the north celestial pole",
+    stars: [
+      {x:68,y:18},{x:74,y:35},{x:62,y:45},{x:46,y:55},{x:32,y:50},{x:22,y:35},{x:26,y:20}
+    ],
+    // Eltanin(0) Rastaban(1) Grumium(2) Etamin(3) Nodus(4) Thuban(5) Kappa(6)
+    order:[6,5,4,3,2,1,0]
+  },
+  {
+    name: "Hercules", emoji: "💪",
+    description: "The Strongman — mythological hero who completed twelve legendary labours",
+    stars: [
+      {x:36,y:24},{x:60,y:22},{x:68,y:48},{x:54,y:64},{x:36,y:64},{x:24,y:46}
+    ],
+    // Kornephoros(0) Zeta(1) Pi(2) Eta(3) Epsilon(4) Delta(5)
+    order:[0,1,2,3,4,5]
+  },
+  {
+    name: "Boötes", emoji: "🌾",
+    description: "The Herdsman — features brilliant orange Arcturus, the brightest northern star",
+    stars: [
+      {x:50,y:15},{x:30,y:42},{x:70,y:40},{x:24,y:68},{x:74,y:64}
+    ],
+    // Arcturus(0) Eta(1) Epsilon(2) Delta(3) Gamma(4)
+    order:[3,1,0,2,4]
+  },
+  {
+    name: "Corona Borealis", emoji: "👸",
+    description: "The Northern Crown — a delicate arc of stars set like a jewelled tiara",
+    stars: [
+      {x:18,y:62},{x:33,y:35},{x:50,y:22},{x:67,y:35},{x:82,y:62}
+    ],
+    // Theta(0) Beta(1) Alphecca(2) Gamma(3) Iota(4)
+    order:[0,1,2,3,4]
+  },
+  {
+    name: "Virgo", emoji: "♍",
+    description: "The Maiden — largest zodiac constellation, anchored by brilliant blue Spica",
+    stars: [
+      {x:28,y:22},{x:44,y:35},{x:56,y:25},{x:64,y:52},{x:44,y:65},{x:22,y:52}
+    ],
+    // Vindemiatrix(0) Porrima(1) Zaniah(2) Spica(3) Heze(4) Eta(5)
+    order:[0,1,2,3,4,5]
+  },
+  {
+    name: "Libra", emoji: "⚖️",
+    description: "The Scales — the only zodiac constellation representing an inanimate object",
+    stars: [
+      {x:24,y:55},{x:44,y:27},{x:62,y:24},{x:72,y:52},{x:36,y:72}
+    ],
+    // Beta(0) Zubenelgenubi(1) Zubeneschamali(2) Gamma(3) Iota(4)
+    order:[0,1,2,3,4]
+  },
+  {
+    name: "Aries", emoji: "🐏",
+    description: "The Ram — first sign of the zodiac, marked by compact star group",
+    stars: [
+      {x:22,y:50},{x:40,y:40},{x:56,y:42},{x:70,y:35}
+    ],
+    // Hamal(0) Sheratan(1) Mesarthim(2) 41-Ari(3)
+    order:[0,1,2,3]
+  },
+  {
+    name: "Cancer", emoji: "🦀",
+    description: "The Crab — faintest zodiac constellation, home to the Beehive Cluster",
+    stars: [
+      {x:22,y:50},{x:44,y:30},{x:60,y:28},{x:74,y:45},{x:46,y:68}
+    ],
+    // Acubens(0) Asellus Borealis(1) Asellus Australis(2) Iota(3) Beta(4)
+    order:[0,4,2,1,4,3]
+  },
+  {
+    name: "Sagittarius", emoji: "🏹",
+    description: "The Archer — the Teapot asterism points toward the galaxy's centre",
+    stars: [
+      {x:22,y:75},{x:35,y:58},{x:50,y:44},{x:60,y:58},{x:70,y:68},{x:62,y:80},{x:42,y:80}
+    ],
+    // KausAus(0) KausMed(1) KausBor(2) Nunki(3) Tau(4) Zeta(5) Phi(6)
+    order:[0,1,2,3,4,5,6]
+  },
+  {
+    name: "Pegasus", emoji: "🐎",
+    description: "The Winged Horse — the Great Square of Pegasus is a landmark of autumn skies",
+    stars: [
+      {x:18,y:20},{x:72,y:18},{x:74,y:70},{x:16,y:72},{x:45,y:45}
+    ],
+    // Scheat(0) Enif(1) Markab(2) Algenib(3) Homam(4)
+    order:[4,0,3,2,1]
+  },
+  {
+    name: "Andromeda", emoji: "🌌",
+    description: "The Chained Princess — points toward her namesake galaxy, 2.5 million light-years away",
+    stars: [
+      {x:18,y:55},{x:36,y:42},{x:56,y:32},{x:70,y:22},{x:28,y:70}
+    ],
+    // Alpheratz(0) Mirach(1) Almach(2) Upsilon(3) Delta(4)
+    order:[4,0,1,2,3]
+  },
+  {
+    name: "Canis Major", emoji: "🐕",
+    description: "The Great Dog — home to Sirius, the brightest star in the entire night sky",
+    stars: [
+      {x:35,y:18},{x:18,y:40},{x:54,y:44},{x:66,y:58},{x:28,y:64}
+    ],
+    // Sirius(0) Mirzam(1) Aludra(2) Eta(3) Wezen(4)
+    order:[1,0,2,3,4]
+  },
+  {
+    name: "Corvus", emoji: "🐦‍⬛",
+    description: "The Crow — a compact quadrilateral of stars low in the southern spring sky",
+    stars: [
+      {x:22,y:28},{x:38,y:18},{x:58,y:24},{x:68,y:46},{x:40,y:58}
+    ],
+    // Alchiba(0) Gienah(1) Kraz(2) Algorab(3) Minkar(4)
+    order:[0,1,2,3,4]
+  },
+  {
+    name: "Delphinus", emoji: "🐬",
+    description: "The Dolphin — a tiny but charming constellation also called Job's Coffin",
+    stars: [
+      {x:50,y:20},{x:28,y:44},{x:74,y:42},{x:35,y:68},{x:65,y:65}
+    ],
+    // Rotanev(0) Svalocin(1) Gamma(2) Delta(3) Epsilon(4)
+    order:[1,0,2,4,3]
+  },
+  {
+    name: "Lepus", emoji: "🐇",
+    description: "The Hare — crouching beneath Orion's feet, ready to flee the Hunter",
+    stars: [
+      {x:24,y:28},{x:46,y:22},{x:63,y:34},{x:66,y:58},{x:38,y:65}
+    ],
+    // Arneb(0) Nihal(1) Epsilon(2) Mu(3) Kappa(4)
+    order:[0,1,2,3,4]
+  },
+  {
+    name: "Ophiuchus", emoji: "🐍",
+    description: "The Serpent Bearer — the unofficial 13th zodiac constellation",
+    stars: [
+      {x:50,y:15},{x:28,y:35},{x:70,y:32},{x:18,y:58},{x:75,y:60},{x:50,y:75}
+    ],
+    // Rasalhague(0) Cebalrai(1) Zeta(2) Eta(3) Theta(4) Sabik(5)
+    order:[0,1,3,5,4,2]
+  },
+  {
+    name: "Pisces", emoji: "🐟",
+    description: "The Fish — two celestial fish tied together by a long cord of stars",
+    stars: [
+      {x:18,y:30},{x:36,y:22},{x:54,y:26},{x:70,y:34},{x:64,y:58},{x:24,y:62}
+    ],
+    // Eta(0) Gamma(1) Kappa(2) Lambda(3) Iota(4) Alrescha(5)
+    order:[0,1,2,3,4,5]
+  },
+  {
+    name: "Ursa Minor", emoji: "🐻‍❄️",
+    description: "The Little Bear — Polaris, the North Star, sits at the end of its tail",
+    stars: [
+      {x:50,y:14},{x:44,y:28},{x:36,y:44},{x:28,y:58},{x:36,y:68},{x:52,y:65},{x:64,y:56}
+    ],
+    // Polaris(0) Yildun(1) Pherkad(2) GamUMi(3) BetUMi(4) DeltUMi(5) EpsUMi(6)
+    order:[0,1,2,3,4,5,6]
+  },
+  {
+    name: "Capricornus", emoji: "🐐",
+    description: "The Sea-Goat — an ancient zodiac sign combining a goat and a fish",
+    stars: [
+      {x:18,y:40},{x:38,y:28},{x:60,y:32},{x:75,y:45},{x:46,y:65}
+    ],
+    // Algedi(0) Dabih(1) Nashira(2) Deneb(3) Omega(4)
+    order:[0,1,2,3,4]
+  },
+  {
+    name: "Centaurus", emoji: "🏇",
+    description: "The Centaur — home to Alpha Centauri, the closest star system to our Sun",
+    stars: [
+      {x:24,y:44},{x:44,y:28},{x:60,y:22},{x:70,y:40},{x:38,y:65}
+    ],
+    // Hadar(0) Alpha Cen(1) Eps(2) Gamma(3) Theta(4)
+    order:[0,4,1,2,3]
+  },
+  {
+    name: "Lupus", emoji: "🐺",
+    description: "The Wolf — an ancient constellation in the southern hemisphere skies",
+    stars: [
+      {x:24,y:25},{x:46,y:18},{x:64,y:26},{x:70,y:50},{x:28,y:58}
+    ],
+    // Alpha(0) Beta(1) Gamma(2) Delta(3) Epsilon(4)
+    order:[0,1,2,3,4]
+  },
+  {
+    name: "Auriga", emoji: "🎠",
+    description: "The Charioteer — a pentagon of stars with golden Capella at the top",
+    stars: [
+      {x:50,y:16},{x:24,y:35},{x:18,y:64},{x:56,y:74},{x:80,y:50}
+    ],
+    // Capella(0) Beta(1) Theta(2) Iota(3) Delta(4)
+    order:[0,1,2,3,4]
+  },
+  {
+    name: "Piscis Austrinus", emoji: "🐠",
+    description: "The Southern Fish — Fomalhaut, its lonely bright star, is the 'Autumn Star'",
+    stars: [
+      {x:28,y:28},{x:50,y:45},{x:68,y:58},{x:20,y:60}
+    ],
+    // Fomalhaut(0) Epsilon(1) Delta(2) Beta(3)
+    order:[0,1,2,3]
+  }
+];
+
+/* ════════════════════════════════════════════
+   DAILY SEED & PUZZLE SELECTION
+   ════════════════════════════════════════════ */
+function getDateKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function getDailySeed() {
+  const d = new Date();
+  return d.getFullYear() * 10000 + (d.getMonth()+1) * 100 + d.getDate();
+}
+
+function getTodayIndex() {
+  const seed = getDailySeed();
+  // Knuth multiplicative hash — deterministic for same date, varied across days
+  const h = Math.abs((seed * 2654435761) | 0) >>> 0;
+  return h % CONSTELLATIONS.length;
+}
+
+/* ════════════════════════════════════════════
+   STORAGE
+   ════════════════════════════════════════════ */
+const STORE_KEY = 'cosmic-connect-v2';
+
+function loadStore() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { return {}; }
+}
+function saveStore(s) {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch {}
+}
+
+function getStreak(store) { return store.streak || 0; }
+function getLastDate(store) { return store.lastDate || ''; }
+
+function recordResult(won) {
+  const store = loadStore();
+  const today = getDateKey();
+  const yesterday = (() => {
+    const d = new Date(); d.setDate(d.getDate()-1);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  })();
+
+  if (!store.days) store.days = {};
+  store.days[today] = { won, attempts: state.attemptsUsed };
+
+  if (won) {
+    store.streak = (getLastDate(store) === yesterday ? getStreak(store) : 0) + 1;
+  } else {
+    store.streak = 0;
+  }
+  store.lastDate = today;
+  saveStore(store);
+}
+
+/* ════════════════════════════════════════════
+   AUDIO (Web Audio API)
+   ════════════════════════════════════════════ */
+let _actx = null;
+function getACtx() {
+  if (!_actx) {
+    _actx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (_actx.state === 'suspended') _actx.resume();
+  return _actx;
+}
+
+function playNote(freq, dur=0.14, vol=0.28, type='sine', when=0) {
+  try {
+    const ctx = getACtx();
+    const t = ctx.currentTime + when;
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.connect(g); g.connect(ctx.destination);
+    osc.frequency.value = freq;
+    osc.type = type;
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    osc.start(t); osc.stop(t + dur + 0.01);
+  } catch(e) {}
+}
+
+function sfxCorrect() {
+  playNote(523, 0.1, 0.25);
+  playNote(659, 0.12, 0.22, 'sine', 0.09);
+}
+
+function sfxWrong() {
+  playNote(200, 0.18, 0.3, 'sawtooth');
+  playNote(155, 0.15, 0.25, 'sawtooth', 0.1);
+}
+
+function sfxComplete() {
+  [523,659,784,1047].forEach((f,i) => playNote(f, 0.28, 0.25, 'sine', i*0.13));
+}
+
+/* ════════════════════════════════════════════
+   GAME STATE
+   ════════════════════════════════════════════ */
+const MAX_ATTEMPTS = 5;
+
+const state = {
+  conIdx: 0,
+  constellation: null,
+  currentStep: 0,       // position in order[]
+  attemptsUsed: 0,
+  done: false,
+  won: false,
+  // canvas
+  bgStars: [],
+  scaledStars: [],      // {cx, cy, r, twinklePhase, twinkleSpeed} in canvas px
+  completedLines: [],   // [{x1,y1,x2,y2}] drawn so far
+  selectedIdx: null,    // last star index confirmed
+  wrongFlash: false,    // show red flash on wrong tap
+  wrongFlashTimer: 0,
+  // animation
+  animFrame: null,
+  startTime: 0,
+};
+
+/* ════════════════════════════════════════════
+   CANVAS SETUP
+   ════════════════════════════════════════════ */
+const canvas = document.getElementById('gameCanvas');
+const ctx    = canvas.getContext('2d');
+
+function resizeCanvas() {
+  const wrap = document.getElementById('canvasWrap');
+  const dpr = window.devicePixelRatio || 1;
+  const w = wrap.clientWidth;
+  const h = wrap.clientHeight;
+  canvas.width  = w * dpr;
+  canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
+  rebuildScaledStars();
+}
+
+function normToCanvas(nx, ny) {
+  const dpr = window.devicePixelRatio || 1;
+  const cw = canvas.width  / dpr;
+  const ch = canvas.height / dpr;
+  const pad = 0.08;
+  return {
+    x: pad * cw + nx * 0.01 * cw * (1 - 2*pad),
+    y: pad * ch + ny * 0.01 * ch * (1 - 2*pad)
+  };
+}
+
+function rebuildScaledStars() {
+  if (!state.constellation) return;
+  state.scaledStars = state.constellation.stars.map((s, i) => {
+    const {x, y} = normToCanvas(s.x, s.y);
+    return {
+      cx: x, cy: y,
+      r: 6,
+      twinklePhase: Math.random() * Math.PI * 2,
+      twinkleSpeed: 0.6 + Math.random() * 1.0,
+    };
+  });
+  generateBgStars();
+}
+
+function generateBgStars() {
+  const dpr = window.devicePixelRatio || 1;
+  const cw = canvas.width  / dpr;
+  const ch = canvas.height / dpr;
+  const count = Math.floor((cw * ch) / 1800);
+  state.bgStars = [];
+  for (let i = 0; i < count; i++) {
+    state.bgStars.push({
+      x: Math.random() * cw,
+      y: Math.random() * ch,
+      r: 0.4 + Math.random() * 1.2,
+      alpha: 0.2 + Math.random() * 0.5,
+      phase: Math.random() * Math.PI * 2,
+      speed: 0.3 + Math.random() * 0.8,
+    });
+  }
+}
+
+/* ════════════════════════════════════════════
+   RENDER LOOP
+   ════════════════════════════════════════════ */
+function draw(ts) {
+  const dpr = window.devicePixelRatio || 1;
+  const cw = canvas.width  / dpr;
+  const ch = canvas.height / dpr;
+  const t = ts * 0.001;
+
+  ctx.clearRect(0, 0, cw, ch);
+
+  // background stars
+  state.bgStars.forEach(s => {
+    const tw = 0.6 + 0.4 * Math.sin(t * s.speed + s.phase);
+    ctx.save();
+    ctx.globalAlpha = s.alpha * tw;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  });
+
+  if (!state.scaledStars.length) {
+    state.animFrame = requestAnimationFrame(draw);
+    return;
+  }
+
+  // completed connection lines
+  state.completedLines.forEach(ln => {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(167,139,250,0.55)';
+    ctx.lineWidth = 1.8;
+    ctx.shadowColor = '#a78bfa';
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.moveTo(ln.x1, ln.y1);
+    ctx.lineTo(ln.x2, ln.y2);
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  // wrong flash overlay
+  if (state.wrongFlash) {
+    state.wrongFlashTimer -= 1;
+    if (state.wrongFlashTimer <= 0) state.wrongFlash = false;
+    ctx.save();
+    ctx.fillStyle = `rgba(239,68,68,${0.08 * (state.wrongFlashTimer / 10)})`;
+    ctx.fillRect(0, 0, cw, ch);
+    ctx.restore();
+  }
+
+  // game stars
+  const totalSteps = state.constellation.order.length;
+  const nextStarIdx = !state.done ? state.constellation.order[state.currentStep] : -1;
+
+  state.scaledStars.forEach((s, i) => {
+    const tw = 0.7 + 0.3 * Math.sin(t * s.twinkleSpeed + s.twinklePhase);
+    const isNext = (i === nextStarIdx);
+    const isConnected = isStarConnected(i);
+    const r = s.r;
+
+    ctx.save();
+
+    // outer glow for connected / next stars
+    if (isConnected || isNext) {
+      const glowR = r + (isNext ? 3 + 2*Math.sin(t*2.5) : 2);
+      const grd = ctx.createRadialGradient(s.cx, s.cy, 0, s.cx, s.cy, glowR * 4);
+      const col = isNext ? '#c4b5fd' : '#818cf8';
+      grd.addColorStop(0, col.replace('#','rgba(').replace(/(..)(..)(..)/, (_, r,g,b)=>
+        `${parseInt(r,16)},${parseInt(g,16)},${parseInt(b,16)}`) + `,${isNext?0.25:0.18})`);
+      grd.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.arc(s.cx, s.cy, glowR*4, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    // pulsing ring for next star
+    if (isNext && !state.done) {
+      const pulse = 0.5 + 0.5*Math.sin(t*3);
+      ctx.save();
+      ctx.strokeStyle = `rgba(196,181,253,${0.5 * pulse})`;
+      ctx.lineWidth = 1.5;
+      ctx.shadowColor = '#c4b5fd';
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.arc(s.cx, s.cy, r + 6 + 4*pulse, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // star body
+    const starAlpha = tw;
+    ctx.globalAlpha = starAlpha;
+
+    if (isConnected) {
+      // bright connected star
+      ctx.shadowColor = '#a78bfa';
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = '#c4b5fd';
+    } else if (isNext) {
+      ctx.shadowColor = '#e0d9ff';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = '#ede9fe';
+    } else {
+      ctx.shadowColor = 'rgba(255,255,255,0.5)';
+      ctx.shadowBlur = 5;
+      ctx.fillStyle = 'rgba(220,220,255,0.85)';
+    }
+
+    ctx.beginPath();
+    ctx.arc(s.cx, s.cy, r * (isNext || isConnected ? 1.15 : 0.9), 0, Math.PI*2);
+    ctx.fill();
+
+    // center sparkle
+    ctx.globalAlpha = 0.8 * starAlpha;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(s.cx, s.cy, r * 0.38, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.restore();
+  });
+
+  state.animFrame = requestAnimationFrame(draw);
+}
+
+/* Check if a star index has been fully connected (appears in completedLines) */
+function isStarConnected(idx) {
+  // A star is "lit" if it's the last confirmed star (selectedIdx)
+  // or it appears in any completed line
+  if (state.selectedIdx === idx) return true;
+  return state.completedLines.some(ln => {
+    const s = state.scaledStars;
+    const matches = (px, py, si) => Math.abs(s[si].cx - px) < 0.5 && Math.abs(s[si].cy - py) < 0.5;
+    // Check if this line endpoint matches star idx
+    return (Math.round(ln.x1) === Math.round(s[idx].cx) && Math.round(ln.y1) === Math.round(s[idx].cy)) ||
+           (Math.round(ln.x2) === Math.round(s[idx].cx) && Math.round(ln.y2) === Math.round(s[idx].cy));
+  });
+}
+
+/* ════════════════════════════════════════════
+   INPUT HANDLING
+   ════════════════════════════════════════════ */
+function getCanvasPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  let cx, cy;
+  if (e.touches) {
+    const t = e.touches[0] || e.changedTouches[0];
+    cx = t.clientX - rect.left;
+    cy = t.clientY - rect.top;
+  } else {
+    cx = e.clientX - rect.left;
+    cy = e.clientY - rect.top;
+  }
+  return { x: cx, y: cy };
+}
+
+function findNearestStar(px, py) {
+  let best = null, bestDist = Infinity;
+  const threshold = 44; // px touch radius
+  state.scaledStars.forEach((s, i) => {
+    const d = Math.hypot(s.cx - px, s.cy - py);
+    if (d < threshold && d < bestDist) {
+      bestDist = d; best = i;
+    }
+  });
+  return best;
+}
+
+function handleTap(e) {
+  e.preventDefault();
+  if (state.done) return;
+  const {x, y} = getCanvasPos(e);
+  const starIdx = findNearestStar(x, y);
+  if (starIdx === null) return;
+
+  const expected = state.constellation.order[state.currentStep];
+
+  if (starIdx === expected) {
+    // ── CORRECT ──
+    sfxCorrect();
+
+    // Draw line from last confirmed star to this one
+    if (state.currentStep > 0) {
+      const prevIdx = state.constellation.order[state.currentStep - 1];
+      const prev = state.scaledStars[prevIdx];
+      const curr = state.scaledStars[starIdx];
+      state.completedLines.push({
+        x1: prev.cx, y1: prev.cy,
+        x2: curr.cx, y2: curr.cy,
+      });
+    }
+    state.selectedIdx = starIdx;
+    state.currentStep++;
+
+    if (state.currentStep >= state.constellation.order.length) {
+      // ── PUZZLE COMPLETE ──
+      onComplete();
+    } else {
+      updateStepsUI();
+    }
+  } else {
+    // ── WRONG ──
+    sfxWrong();
+    state.attemptsUsed++;
+    state.wrongFlash = true;
+    state.wrongFlashTimer = 18;
+
+    // Shake the canvas wrap
+    const wrap = document.getElementById('canvasWrap');
+    wrap.classList.remove('shake');
+    void wrap.offsetWidth;
+    wrap.classList.add('shake');
+
+    // Reset progress
+    state.currentStep = 0;
+    state.completedLines = [];
+    state.selectedIdx = null;
+
+    updateAttemptsUI();
+
+    if (state.attemptsUsed >= MAX_ATTEMPTS) {
+      onFail();
+    } else {
+      showToast(`✗ Not quite — ${MAX_ATTEMPTS - state.attemptsUsed} attempt${MAX_ATTEMPTS - state.attemptsUsed === 1 ? '' : 's'} left`, 'err');
+    }
+  }
+}
+
+canvas.addEventListener('touchstart', handleTap, {passive: false});
+canvas.addEventListener('click', handleTap);
+
+/* ════════════════════════════════════════════
+   GAME FLOW
+   ════════════════════════════════════════════ */
+function onComplete() {
+  state.done = true;
+  state.won  = true;
+  sfxComplete();
+  recordResult(true);
+
+  // Draw all remaining lines for celebration (constellation fully lit)
+  // We already drew up to currentStep-1 lines, so this is complete.
+
+  setTimeout(() => {
+    buildShareText();
+    showOverlay('successOverlay');
+    updateStreakBadge();
+
+    const sub = document.getElementById('successSub');
+    const att = state.attemptsUsed;
+    const perfect = att === 0;
+    sub.textContent = perfect
+      ? `Perfect! First try — you're a star navigator! 🌟`
+      : att === 1
+      ? `Brilliant! You only needed ${MAX_ATTEMPTS - att} of ${MAX_ATTEMPTS} attempts.`
+      : `You traced ${state.constellation.name} in ${att === 0 ? 'one try' : `${MAX_ATTEMPTS - att} attempts left`}.`;
+  }, 600);
+}
+
+function onFail() {
+  state.done = true;
+  state.won  = false;
+  recordResult(false);
+
+  setTimeout(() => {
+    buildShareText();
+    document.getElementById('failRevealName').textContent = state.constellation.name;
+    document.getElementById('failRevealDesc').textContent = state.constellation.description;
+    showOverlay('failOverlay');
+    updateStreakBadge();
+  }, 500);
+}
+
+/* ════════════════════════════════════════════
+   UI UPDATES
+   ════════════════════════════════════════════ */
+function updateAttemptsUI() {
+  const pips = document.getElementById('pips');
+  pips.innerHTML = '';
+  for (let i = 0; i < MAX_ATTEMPTS; i++) {
+    const p = document.createElement('div');
+    p.className = 'pip ' + (i < state.attemptsUsed ? 'used' : 'ok');
+    pips.appendChild(p);
+  }
+}
+
+function updateStepsUI() {
+  const total = state.constellation.order.length;
+  const done  = state.currentStep;
+  document.getElementById('stepsVal').textContent = done > 0 ? `${done}/${total} ✓` : '';
+}
+
+function updateStreakBadge() {
+  const store = loadStore();
+  document.getElementById('streakNum').textContent = getStreak(store);
+}
+
+function showOverlay(id) {
+  document.querySelectorAll('.overlay').forEach(o => o.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+}
+
+function hideOverlays() {
+  document.querySelectorAll('.overlay').forEach(o => o.classList.remove('show'));
+}
+
+/* ════════════════════════════════════════════
+   SHARE TEXT
+   ════════════════════════════════════════════ */
+let _shareText = '';
+
+function buildShareText() {
+  const c = state.constellation;
+  const att = state.attemptsUsed;
+  const won = state.won;
+  const today = getDateKey();
+
+  // Emoji row: ⭐ = wrong attempt, 🌟 = successful completion
+  let emojiRow = '';
+  if (won) {
+    for (let i = 0; i < att; i++) emojiRow += '⭐';
+    emojiRow += '🌟';
+    if (att === 0) emojiRow = '🌟✨🌟';
+  } else {
+    emojiRow = '⭐⭐⭐⭐⭐';
+  }
+
+  const label = won
+    ? `Cosmic Connect ${today} ${c.emoji}\n${emojiRow}\nSolved in ${MAX_ATTEMPTS - att}/${MAX_ATTEMPTS} attempts!`
+    : `Cosmic Connect ${today} ${c.emoji}\n${emojiRow}\nBetter luck tomorrow!`;
+
+  _shareText = `${label}\n\ncosmicconnect.cerebra.app`;
+
+  // Update all share boxes
+  ['shareEmojis','doneEmojis'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = emojiRow;
+  });
+
+  ['shareLabel','doneLabel'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = won
+      ? `${c.name} • ${MAX_ATTEMPTS - att} attempt${MAX_ATTEMPTS - att === 1 ? '' : 's'} remaining`
+      : `${c.name} • Better luck tomorrow`;
+  });
+
+  const successSub = document.getElementById('successSub');
+  if (successSub && won) {
+    const left = MAX_ATTEMPTS - att;
+    successSub.textContent = att === 0
+      ? `First try! You're a true star navigator. ✨`
+      : `Connected in ${att+1} ${att+1===1?'attempt':'attempts'} with ${left} to spare.`;
+  }
+}
+
+function copyShare() {
+  if (!_shareText) buildShareText();
+  navigator.clipboard.writeText(_shareText)
+    .then(() => showToast('Copied to clipboard!', 'ok'))
+    .catch(() => {
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = _shareText;
+      document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('Copied!', 'ok');
+    });
+}
+
+/* ════════════════════════════════════════════
+   EMAIL OPT-IN
+   ════════════════════════════════════════════ */
+function joinCerebra(inputId, okId) {
+  const email = document.getElementById(inputId).value.trim();
+  if (!email || !email.includes('@')) {
+    showToast('Please enter a valid email', 'err');
+    return;
+  }
+  // Store locally (no backend — graceful for single-file game)
+  try {
+    const subs = JSON.parse(localStorage.getItem('cerebra-subs') || '[]');
+    if (!subs.includes(email)) subs.push(email);
+    localStorage.setItem('cerebra-subs', JSON.stringify(subs));
+  } catch {}
+  document.getElementById(okId).style.display = 'block';
+  showToast('🌟 Welcome to CEREBRA!', 'ok');
+}
+
+/* ════════════════════════════════════════════
+   TOAST
+   ════════════════════════════════════════════ */
+let _toastTimer = null;
+function showToast(msg, type='neutral') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast ${type} show`;
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+/* ════════════════════════════════════════════
+   INITIALISE
+   ════════════════════════════════════════════ */
+function init() {
+  const store = loadStore();
+  const today = getDateKey();
+  state.conIdx = getTodayIndex();
+  state.constellation = CONSTELLATIONS[state.conIdx];
+
+  // Display constellation info
+  document.getElementById('constName').textContent = state.constellation.name;
+  document.getElementById('constDesc').textContent = state.constellation.description;
+
+  updateStreakBadge();
+  updateAttemptsUI();
+  updateStepsUI();
+
+  // Has the player already played today?
+  if (store.days && store.days[today]) {
+    const prev = store.days[today];
+    state.done = true;
+    state.won  = prev.won;
+    state.attemptsUsed = prev.attempts || 0;
+    buildShareText();
+
+    // Show relevant overlay after a moment
+    setTimeout(() => {
+      if (prev.won) {
+        showOverlay('doneOverlay');
+        document.getElementById('doneSub').textContent =
+          `You already traced ${state.constellation.name} today! Come back tomorrow for a new puzzle.`;
+      } else {
+        showOverlay('failOverlay');
+        document.getElementById('failRevealName').textContent = state.constellation.name;
+        document.getElementById('failRevealDesc').textContent = state.constellation.description;
+      }
+    }, 800);
+  }
+
+  // Size canvas
+  resizeCanvas();
+
+  // Start animation
+  if (state.animFrame) cancelAnimationFrame(state.animFrame);
+  state.startTime = performance.now();
+  state.animFrame = requestAnimationFrame(draw);
+
+  // Hint text
+  document.getElementById('hintText').textContent =
+    `Tap stars in order to trace ${state.constellation.name} — ${state.constellation.order.length} clicks`;
+}
+
+window.addEventListener('resize', () => {
+  resizeCanvas();
+});
+
+// Boot
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
